@@ -1,0 +1,74 @@
+#navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  height: 64px;
+  background: rgba(1,10,22,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nb-logo {
+  font-family: var(--ff-head);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--cyan2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nb-logo .dx { color: var(--orange); }
+.nb-logo .ver {
+  font-size: 0.55rem;
+  background: var(--orange);
+  color: #000;
+  padding: 2px 6px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  border-radius: 2px;
+  vertical-align: middle;
+}
+
+.nb-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  list-style: none;
+}
+.nb-links a {
+  text-decoration: none;
+  font-family: var(--ff-body);
+  font-weight: 600;
+  font-size: 0.82rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  transition: color .2s;
+}
+.nb-links a:hover { color: var(--cyan2); }
+
+.btn-reg {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  background: linear-gradient(135deg, var(--orange), var(--orange2));
+  color: #000 !important;
+  font-family: var(--ff-head);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 9px 24px;
+  clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+  transition: box-shadow .25s, transform .2s;
+}
+.btn-reg:hover {
+  box-shadow: var(--glow-o);
+  transform: translateY(-1px);
+}
