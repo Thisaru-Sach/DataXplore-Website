@@ -1,293 +1,191 @@
-import React, { useEffect, useRef } from "react";
-import "./canvas.css";
+import { useEffect, useRef } from "react";
 
-function Canvas() {
+/*
+  Particles.js-style constellation canvas
+  ─────────────────────────────────────────
+  · Nodes float freely across the whole canvas
+  · Lines drawn between any two nodes closer than LINK_DIST
+  · Line opacity fades with distance
+  · Nodes bounce off canvas edges
+  · Background: prussian blue centre → dark navy edges (radial gradient)
+  · Colours: cyan nodes + lines matching the site palette
+*/
+
+const PARTICLE_COUNT = 90;      // total floating nodes
+const LINK_DIST      = 150;     // max px distance to draw a link
+const SPEED          = 0.35;    // base movement speed (px / frame)
+const DOT_MIN_R      = 1.2;
+const DOT_MAX_R      = 2.6;
+
+const BG_INNER  = "#002548";    // prussian blue
+const BG_OUTER  = "#010d1a";    // dark navy
+const DOT_COL   = "#00c8f0";    // cyan
+const LINE_COL  = { r: 0, g: 185, b: 220 };  // slightly dimmer cyan
+
+export default function Canvas() {
   const cvRef = useRef(null);
 
   useEffect(() => {
-    const cv = cvRef.current;
+    const cv  = cvRef.current;
+    if (!cv) return;
     const ctx = cv.getContext("2d");
-    let W, H;
-    let rafId;
 
-    // Data
-    let nodes = []; // {x,y,r,phase}
-    let segs = []; // {x1,y1,x2,y2}
-    let bokeh = []; // {x,y,r,a,da}
-    let sparks = []; // {x,y,t,max,sz}
-    let pulses = []; // {seg,t,spd}
+    let W = 0, H = 0, rafId = null;
+    let particles = [];
 
-    const G = 52; // grid size
+    /* ── create one particle ── */
+    function makeParticle() {
+      const angle = Math.random() * Math.PI * 2;
+      const spd   = SPEED * (0.4 + Math.random() * 0.6);
+      return {
+        x:  Math.random() * W,
+        y:  Math.random() * H,
+        vx: Math.cos(angle) * spd,
+        vy: Math.sin(angle) * spd,
+        r:  DOT_MIN_R + Math.random() * (DOT_MAX_R - DOT_MIN_R),
+        // twinkle
+        phase: Math.random() * Math.PI * 2,
+        tSpd:  0.4 + Math.random() * 1.0,
+      };
+    }
 
-    function resize() {
-      W = cv.width = window.innerWidth;
+    /* ── initialise / resize ── */
+    function init() {
+      W = cv.width  = window.innerWidth;
       H = cv.height = window.innerHeight;
-      build();
+
+      // scale particle count to screen area
+      const count = Math.round(PARTICLE_COUNT * (W * H) / (1440 * 900));
+      particles = Array.from({ length: Math.max(40, Math.min(count, 180)) }, makeParticle);
     }
 
-    function rnd(a, b) {
-      return a + Math.random() * (b - a);
-    }
-    function snap(v, g) {
-      return Math.round(v / g) * g;
-    }
-
-    function build() {
-      nodes = [];
-      segs = [];
-      bokeh = [];
-      sparks = [];
-      pulses = [];
-
-      const cols = Math.ceil(W / G) + 2;
-      const rows = Math.ceil(H / G) + 2;
-
-      /* nodes */
-      for (let c = 0; c < cols; c++) {
-        for (let r = 0; r < rows; r++) {
-          if (Math.random() < 0.2) {
-            nodes.push({
-              x: c * G,
-              y: r * G,
-              r: rnd(1.2, 3.2),
-              phase: rnd(0, Math.PI * 2),
-            });
-          }
-        }
-      }
-      /* traces from nodes */
-      nodes.forEach((n) => {
-        const nb = Math.floor(rnd(1, 4));
-        for (let b = 0; b < nb; b++) {
-          const horiz = Math.random() < 0.5;
-          const len = Math.floor(rnd(1, 6)) * G;
-          const sign = Math.random() < 0.5 ? 1 : -1;
-          if (horiz) {
-            segs.push({ x1: n.x, y1: n.y, x2: n.x + sign * len, y2: n.y });
-            if (Math.random() < 0.55) {
-              const jl =
-                Math.floor(rnd(1, 4)) * G * (Math.random() < 0.5 ? 1 : -1);
-              segs.push({
-                x1: n.x + sign * len,
-                y1: n.y,
-                x2: n.x + sign * len,
-                y2: n.y + jl,
-              });
-            }
-          } else {
-            segs.push({ x1: n.x, y1: n.y, x2: n.x, y2: n.y + sign * len });
-            if (Math.random() < 0.55) {
-              const jl =
-                Math.floor(rnd(1, 4)) * G * (Math.random() < 0.5 ? 1 : -1);
-              segs.push({
-                x1: n.x,
-                y1: n.y + sign * len,
-                x2: n.x + jl,
-                y2: n.y + sign * len,
-              });
-            }
-          }
-        }
-      });
-
-      /* bokeh blobs */
-      for (let i = 0; i < 32; i++) {
-        bokeh.push({
-          x: rnd(0, W),
-          y: rnd(0, H),
-          r: rnd(25, 110),
-          a: rnd(0.02, 0.08),
-          da: rnd(0.0008, 0.003) * (Math.random() < 0.5 ? 1 : -1),
-        });
-      }
-
-      /* sparkles on a subset of nodes */
-      nodes.forEach((n) => {
-        if (Math.random() < 0.1) {
-          sparks.push({
-            x: n.x,
-            y: n.y,
-            t: rnd(0, 120),
-            max: rnd(90, 160),
-            sz: rnd(7, 16),
-          });
-        }
-      });
-      /* travelling pulses on some segs */
-      segs.forEach((s) => {
-        if (Math.random() < 0.13) {
-          pulses.push({ seg: s, t: Math.random(), spd: rnd(0.003, 0.009) });
-        }
-      });
+    /* ── background gradient ── */
+    function drawBg() {
+      const g = ctx.createRadialGradient(
+        W / 2, H / 2, 0,
+        W / 2, H / 2, Math.hypot(W, H) / 2
+      );
+      g.addColorStop(0.00, BG_INNER);
+      g.addColorStop(0.50, "#011828");
+      g.addColorStop(1.00, BG_OUTER);
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
     }
 
-    /* drawing helpers */
-    function glowLine(x1, y1, x2, y2, col, w, blur) {
+    /* ── draw a line between two close particles ── */
+    function drawLink(ax, ay, bx, by, dist) {
+      const fade = 1 - dist / LINK_DIST;          // 1 when touching, 0 at limit
+      const a    = fade * 0.55;                    // max line opacity
+      if (a < 0.02) return;
+
       ctx.save();
-      ctx.shadowColor = col;
-      ctx.shadowBlur = blur;
-      ctx.strokeStyle = col;
-      ctx.lineWidth = w;
-      ctx.lineCap = "round";
+      ctx.globalAlpha = a;
+      ctx.strokeStyle = `rgb(${LINE_COL.r},${LINE_COL.g},${LINE_COL.b})`;
+      ctx.lineWidth   = 0.8;
+      ctx.shadowColor = DOT_COL;
+      ctx.shadowBlur  = 2;
       ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
+      ctx.moveTo(ax, ay);
+      ctx.lineTo(bx, by);
       ctx.stroke();
       ctx.restore();
     }
 
-    function drawNode(x, y, r, a) {
-      /* outer halo */
-      const g = ctx.createRadialGradient(x, y, 0, x, y, r * 6);
-      g.addColorStop(0, `rgba(0,210,255,${a * 0.55})`);
-      g.addColorStop(0.35, `rgba(0,160,210,${a * 0.22})`);
-      g.addColorStop(1, "rgba(0,0,0,0)");
+    /* ── draw a single particle ── */
+    function drawDot(p, ts) {
+      const twinkle = 0.6 + 0.4 * Math.sin(p.phase + ts * 0.001 * p.tSpd);
+      const a       = twinkle;
+
+      // soft glow halo
+      const hR = p.r * 5;
+      const g  = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, hR);
+      g.addColorStop(0,   `rgba(0,200,240,${(a * 0.45).toFixed(3)})`);
+      g.addColorStop(0.5, `rgba(0,160,210,${(a * 0.14).toFixed(3)})`);
+      g.addColorStop(1,   "rgba(0,0,0,0)");
       ctx.fillStyle = g;
       ctx.beginPath();
-      ctx.arc(x, y, r * 6, 0, Math.PI * 2);
+      ctx.arc(p.x, p.y, hR, 0, Math.PI * 2);
       ctx.fill();
-      /* core */
+
+      // core dot
       ctx.save();
-      ctx.shadowColor = "#00d8ff";
-      ctx.shadowBlur = 14;
-      ctx.fillStyle = `rgba(0,228,255,${0.65 + a * 0.35})`;
+      ctx.shadowColor = DOT_COL;
+      ctx.shadowBlur  = 8 * twinkle;
+      ctx.fillStyle   = `rgba(200,240,255,${a.toFixed(3)})`;
       ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.arc(p.x, p.y, p.r * twinkle, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
     }
 
-    function drawSparkle(x, y, sz, a) {
-      ctx.save();
-      ctx.globalAlpha = a;
-      ctx.shadowColor = "#00d4ff";
-      ctx.shadowBlur = 18;
-      ctx.strokeStyle = "#bbefff";
-      ctx.lineWidth = 1.1;
-      [
-        [0, -sz, 0, sz],
-        [-sz, 0, sz, 0],
-        [-(sz * 0.45), -(sz * 0.45), sz * 0.45, sz * 0.45],
-        [-(sz * 0.45), sz * 0.45, sz * 0.45, -(sz * 0.45)],
-      ].forEach((l) => {
-        ctx.beginPath();
-        ctx.moveTo(x + l[0], y + l[1]);
-        ctx.lineTo(x + l[2], y + l[3]);
-        ctx.stroke();
-      });
-      ctx.fillStyle = "rgba(210,245,255,.92)";
-      ctx.beginPath();
-      ctx.arc(x, y, sz * 0.1, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
+    /* ── update position, bounce off walls ── */
+    function updateParticle(p) {
+      p.x += p.vx;
+      p.y += p.vy;
+
+      if (p.x - p.r < 0)  { p.x = p.r;      p.vx =  Math.abs(p.vx); }
+      if (p.x + p.r > W)  { p.x = W - p.r;  p.vx = -Math.abs(p.vx); }
+      if (p.y - p.r < 0)  { p.y = p.r;      p.vy =  Math.abs(p.vy); }
+      if (p.y + p.r > H)  { p.y = H - p.r;  p.vy = -Math.abs(p.vy); }
     }
 
-    function drawBokeh(b) {
-      const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
-      g.addColorStop(0, `rgba(20,120,210,${b.a})`);
-      g.addColorStop(0.5, `rgba(8,70,150,${b.a * 0.45})`);
-      g.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    function drawPulse(seg, t) {
-      const px = seg.x1 + (seg.x2 - seg.x1) * t;
-      const py = seg.y1 + (seg.y2 - seg.y1) * t;
-      const g = ctx.createRadialGradient(px, py, 0, px, py, 16);
-      g.addColorStop(0, "rgba(255,255,255,.95)");
-      g.addColorStop(0.25, "rgba(120,235,255,.8)");
-      g.addColorStop(1, "rgba(0,180,255,0)");
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(px, py, 16, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    /* main loop */
+    /* ── main animation loop ── */
     function frame(ts) {
-      /* background */
-      ctx.fillStyle = "#010d1a";
-      ctx.fillRect(0, 0, W, H);
+      ctx.clearRect(0, 0, W, H);
+      drawBg();
 
-      /* deep centre glow (bottom, like reference image) */
-      const bg = ctx.createRadialGradient(
-        W * 0.5,
-        H * 0.9,
-        0,
-        W * 0.5,
-        H * 0.9,
-        W * 0.75,
-      );
-      bg.addColorStop(0, "rgba(0,55,110,.6)");
-      bg.addColorStop(0.5, "rgba(0,28,60,.28)");
-      bg.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, W, H);
+      const n = particles.length;
 
-      /* top vignette */
-      const tv = ctx.createLinearGradient(0, 0, 0, H * 0.45);
-      tv.addColorStop(0, "rgba(1,6,14,.75)");
-      tv.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = tv;
-      ctx.fillRect(0, 0, W, H);
-
-      /* bokeh */
-      bokeh.forEach((b) => {
-        b.a += b.da;
-        if (b.a > 0.1 || b.a < 0.015) b.da *= -1;
-        drawBokeh(b);
-      });
-
-      /* segs: base dim + glow */
-      segs.forEach((s) => {
-        glowLine(s.x1, s.y1, s.x2, s.y2, "rgba(0,170,210,0.11)", 1.6, 0);
-        glowLine(s.x1, s.y1, s.x2, s.y2, "rgba(0,210,255,0.55)", 0.8, 9);
-      });
-
-      /* nodes */
-      const t = ts * 0.001;
-      nodes.forEach((n) => {
-        const a = 0.45 + 0.55 * Math.sin((n.phase += 0.016));
-        drawNode(n.x, n.y, n.r, a);
-      });
-
-      /* sparkles */
-      sparks.forEach((sp) => {
-        sp.t++;
-        if (sp.t > sp.max) {
-          sp.t = 0;
-          sp.max = rnd(80, 160);
+      // draw links first (below dots)
+      for (let i = 0; i < n; i++) {
+        for (let j = i + 1; j < n; j++) {
+          const dx   = particles[i].x - particles[j].x;
+          const dy   = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < LINK_DIST) {
+            drawLink(particles[i].x, particles[i].y, particles[j].x, particles[j].y, dist);
+          }
         }
-        const p = sp.t / sp.max;
-        const a = p < 0.3 ? p / 0.3 : p > 0.7 ? (1 - p) / 0.3 : 1;
-        drawSparkle(sp.x, sp.y, sp.sz * a, a * 0.9);
-      });
+      }
 
-      /* pulses */
-      pulses.forEach((p) => {
-        p.t += p.spd;
-        if (p.t > 1) p.t = 0;
-        drawPulse(p.seg, p.t);
-      });
+      // update + draw dots on top
+      for (let i = 0; i < n; i++) {
+        updateParticle(particles[i]);
+        drawDot(particles[i], ts);
+      }
 
-      requestAnimationFrame(frame);
+      rafId = requestAnimationFrame(frame);
     }
-    resize();
-    window.addEventListener("resize", resize);
-    requestAnimationFrame(frame);
+
+    /* ── start ── */
+    rafId = requestAnimationFrame(() => {
+      init();
+      rafId = requestAnimationFrame(frame);
+    });
+
+    const onResize = () => {
+      cancelAnimationFrame(rafId);
+      init();
+      rafId = requestAnimationFrame(frame);
+    };
+    window.addEventListener("resize", onResize);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener("resize", onResize);
+    };
   }, []);
 
   return (
-    <>
-      {/* BG CANVAS  */}
-      <canvas ref={cvRef} id="bg-canvas">
-        Hi
-      </canvas>
-    </>
+    <canvas
+      ref={cvRef}
+      style={{
+        position:      "fixed",
+        inset:         0,
+        zIndex:        0,
+        pointerEvents: "none",
+        display:       "block",
+      }}
+    />
   );
 }
-
-export default Canvas;

@@ -30,26 +30,30 @@
 /* Event logo box */
 .hero-logo-slot {
   position: relative;
-  width: 180px; height: 180px;
-  margin: 0 auto 36px;
+  width: 240px; height: 240px;
+  margin: 0 auto 0;
   border-radius: 16px;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  background: rgba(0,40,80,0.5);
-  border: 2px dashed rgba(0,200,240,0.35);
+  background: transparent;
+  border: 2px hodden rgba(0,200,240,0.35);
   overflow: hidden;
   animation: fade-up .8s ease both;
 }
-.hero-logo-slot::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(0,200,240,0.08), transparent 60%, rgba(245,162,0,0.08));
-  border-radius: 14px;
+.hero-logo-name-slot {
+  position: relative;
+  width: 1000px; height: 240px;
+  margin: 0 auto 2;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: transparent;
+  overflow: hidden;
+  animation: fade-up .8s ease both;
 }
-.hero-logo-slot .slot-label {
+.slot-label {
   font-family: var(--ff-mono);
   font-size: 0.6rem;
-  color: rgba(0,200,240,0.5);
+  color: none;
   letter-spacing: 2px;
   text-align: center;
   z-index: 1;
@@ -57,16 +61,6 @@
 }
 .hero-logo-slot .slot-icon { font-size: 2.2rem; opacity: .3; z-index:1; }
 
-/* Rotating border glow */
-.hero-logo-slot::after {
-  content:'';
-  position:absolute; inset:-2px;
-  border-radius:18px;
-  background: conic-gradient(from 0deg, transparent 60%, rgba(0,200,240,0.5) 75%, transparent 90%);
-  animation: spin-border 3s linear infinite;
-  z-index:0;
-}
-@keyframes spin-border { to { transform: rotate(360deg); } }
 
 .hero-chip {
   font-family: var(--ff-mono);

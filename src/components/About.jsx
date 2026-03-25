@@ -23,7 +23,7 @@ function About() {
             <p>
               It serves as a creative arena where students dive deep into data
               analysis, explore innovative modelling techniques, and transform
-              raw information into meaningful narratives — celebrating
+              raw information into meaningful narratives celebrating
               analytical thinking, curiosity, and data-driven storytelling.
             </p>
             <p>

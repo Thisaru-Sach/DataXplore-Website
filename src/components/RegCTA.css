@@ -1,0 +1,26 @@
+#sec-register {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 80px 48px;
+  overflow: hidden;
+}
+#sec-register::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(0,37,72,0.6), rgba(0,20,42,0.8));
+  z-index: -1;
+}
+#sec-register .big {
+  font-family: var(--ff-head);
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 12px;
+}
+#sec-register .big span { color: var(--orange); }
+#sec-register p {
+  color: var(--muted);
+  font-size: 1.05rem;
+  margin-bottom: 36px;
+}

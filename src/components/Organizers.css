@@ -1,0 +1,90 @@
+.org-center { text-align: center; }
+
+.org-logo-ring {
+  width: 158px; height: 158px;
+  border-radius: 50%;
+  border: 2px solid var(--cyan);
+  box-shadow: 0 0 32px rgba(0,200,240,.25), inset 0 0 20px rgba(0,200,240,.05);
+  background: rgba(2,20,40,.8);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  margin: 0 auto 20px;
+  animation: org-glow 3s ease-in-out infinite;
+}
+@keyframes org-glow {
+  0%,100% { box-shadow: 0 0 20px rgba(0,200,240,.2); }
+  50%      { box-shadow: 0 0 40px rgba(0,200,240,.45); }
+}
+.org-logo-ring img { width:100%; height:100%; object-fit:cover; }
+
+.org-name-container{
+  width: 100%;
+  height: auto;
+  display: flex;
+  justify-content: center;
+}
+.org-logo-name-slot{
+  position: relative;
+  width: 50%; height: 60%;
+  margin: 0 auto 2;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: transparent;
+  overflow: hidden;
+  animation: fade-up .8s ease both;
+}
+
+.contacts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  max-width: 680px;
+  margin: 0 auto 40px;
+}
+.ccard {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  padding: 20px 22px;
+  text-align: left;
+  transition: border-color .3s, box-shadow .3s;
+}
+.ccard:hover { border-color: var(--cyan); box-shadow: var(--glow-c); }
+.ccard .role {
+  font-family: var(--ff-mono);
+  font-size: 0.6rem;
+  color: var(--cyan);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+.ccard .name {
+  font-family: var(--ff-head);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 4px;
+}
+.ccard .phone {
+  font-family: var(--ff-mono);
+  font-size: 0.8rem;
+  color: var(--orange);
+}
+
+.socials {
+  display: flex; gap: 16px;
+  justify-content: center; flex-wrap: wrap;
+}
+.social-btn {
+  display: inline-flex; align-items: center; gap: 9px;
+  text-decoration: none;
+  color: var(--muted);
+  font-family: var(--ff-body);
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  padding: 9px 22px;
+  border: 1px solid var(--border);
+  transition: color .25s, border-color .25s, box-shadow .25s;
+}
+.social-btn:hover { color: var(--cyan); border-color: var(--cyan); box-shadow: var(--glow-c); }
+.social-btn svg { width:16px; height:16px; fill:currentColor; flex-shrink:0; }

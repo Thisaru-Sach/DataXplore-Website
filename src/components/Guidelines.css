@@ -1,0 +1,67 @@
+.tab-bar {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 0;
+}
+.tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 11px 24px;
+  font-family: var(--ff-head);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color .2s, border-color .2s;
+  margin-bottom: -1px;
+}
+.tab:hover { color: var(--white); }
+.tab.active { color: var(--cyan2); border-bottom-color: var(--cyan2); }
+
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+.gl-list { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+.gl-list li {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  padding: 13px 18px 13px 52px;
+  color: var(--muted);
+  font-size: 0.97rem;
+  line-height: 1.5;
+  position: relative;
+  transition: border-color .25s;
+}
+.gl-list li:hover { border-color: rgba(0,200,240,.35); }
+.gl-list li .n {
+  position: absolute;
+  left: 14px; top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--ff-mono);
+  font-size: 0.62rem;
+  color: var(--cyan);
+}
+.gl-list li strong { color: var(--white); font-weight: 600; }
+
+.quiz-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin: 16px 0;
+}
+.q-chip {
+  background: rgba(0,200,240,0.06);
+  border: 1px solid var(--border);
+  padding: 10px 8px;
+  text-align: center;
+  font-family: var(--ff-head);
+  font-size: 0.62rem;
+  color: var(--cyan);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}

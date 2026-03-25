@@ -1,0 +1,53 @@
+.about-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 56px;
+  align-items: start;
+}
+.about-body p {
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.75;
+  margin-bottom: 18px;
+}
+.about-body p strong { color: var(--cyan2); font-weight: 600; }
+
+.about-pills {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  margin-top: 24px;
+}
+.pill {
+  font-family: var(--ff-mono);
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  color: var(--cyan);
+  border: 1px solid var(--border);
+  padding: 5px 14px;
+  background: rgba(0,200,240,0.05);
+}
+
+.about-cards {
+  display: flex; flex-direction: column; gap: 16px;
+}
+.acard {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--orange);
+  padding: 20px 22px;
+  transition: border-color .3s, box-shadow .3s, transform .3s;
+}
+.acard:hover {
+  border-color: var(--cyan);
+  box-shadow: var(--glow-c);
+  transform: translateX(4px);
+}
+.acard h3 {
+  font-family: var(--ff-head);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--orange);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+.acard p { color: var(--muted); font-size: 0.95rem; line-height: 1.55; }
