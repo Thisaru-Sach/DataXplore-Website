@@ -65,3 +65,76 @@
   letter-spacing: 1px;
   text-transform: uppercase;
 }
+
+/* --- RESPONSIVE DESIGN --- */
+
+@media (max-width: 992px) {
+  .gl-list li {
+    font-size: 0.9rem;
+    padding: 15px 18px 15px 45px; /* Slightly tighter padding */
+  }
+}
+
+@media (max-width: 768px) {
+  .tab-bar {
+    display: grid;
+    /* Create a 2 or 3 column grid depending on space */
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    border-bottom: none;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .tab {
+    border: 1px solid var(--border); /* Use box borders instead of just bottom */
+    padding: 12px 10px;
+    font-size: 0.6rem;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 0;
+    background: rgba(255, 255, 255, 0.02);
+    transition: all 0.3s ease;
+  }
+
+  .tab.active {
+    background: rgba(0, 200, 240, 0.1);
+    border-color: var(--cyan2);
+    color: var(--cyan2);
+    border-bottom-color: var(--cyan2); /* Keep the highlight logic */
+  }
+
+  .gl-list {
+    gap: 15px; /* More space between items for touch accuracy */
+  }
+
+  .gl-list li {
+    padding: 16px 16px 16px 40px;
+    line-height: 1.4;
+  }
+
+  .gl-list li .n {
+    left: 12px;
+    font-size: 0.55rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tab-bar {
+    /* On very small phones, stack them 2 per row */
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .tab {
+    letter-spacing: 1px;
+    padding: 10px 5px;
+  }
+
+  /* Make the "Stage 3 & 4" button span full width if it's the odd one out */
+  .tab:last-child:nth-child(odd) {
+    grid-column: span 2;
+  }
+
+  .sec-title {
+    font-size: 1.8rem;
+  }
+}

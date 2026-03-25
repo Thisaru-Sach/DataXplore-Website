@@ -53,3 +53,68 @@
   top: 4px;
 }
 .stage ul li strong { color: var(--white); font-weight: 600; }
+
+/* --- RESPONSIVE DESIGN --- */
+
+@media (max-width: 1024px) {
+  .stages-wrap {
+    /* Slightly reduce gap for tablets */
+    gap: 16px;
+  }
+  
+  .stage {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .stages-wrap {
+    /* Stack stages vertically on mobile */
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .stage {
+    padding: 22px 20px;
+    /* Remove heavy hover translation on mobile to avoid layout shifts */
+    transform: none;
+  }
+
+  .stage:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0,0,0,.3), var(--glow-c);
+  }
+
+  .stage-badge {
+    font-size: 0.55rem;
+    letter-spacing: 2px;
+  }
+
+  .stage h3 {
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+
+  .stage ul li {
+    font-size: 0.88rem;
+    line-height: 1.45;
+    padding-left: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stage {
+    padding: 20px 16px;
+  }
+
+  /* Make strong text slightly more prominent on small screens */
+  .stage ul li strong {
+    color: var(--cyan2); 
+  }
+
+  /* Ensure the divider before the stage isn't too thick */
+  .stage::before {
+    height: 2px;
+  }
+}

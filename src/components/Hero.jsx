@@ -38,7 +38,7 @@ function Hero() {
         </div>
         <p className="hero-sub">Inter-University Data Analytics Competition</p>
         <p className="hero-desc">
-          Where data meets discovery — explore, analyze, and transform insights
+          Where data meets discovery, explore, analyze, and transform insights
           into impact.
         </p>
 

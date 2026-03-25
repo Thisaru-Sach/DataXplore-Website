@@ -88,3 +88,66 @@
 }
 .social-btn:hover { color: var(--cyan); border-color: var(--cyan); box-shadow: var(--glow-c); }
 .social-btn svg { width:16px; height:16px; fill:currentColor; flex-shrink:0; }
+
+/* --- RESPONSIVE DESIGN --- */
+
+@media (max-width: 768px) {
+  .org-logo-ring {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 15px;
+  }
+
+  .org-logo-name-slot {
+    /* Critical: Change from fixed 580px to fluid width */
+    width: 90% !important; 
+    height: auto;
+    aspect-ratio: 4 / 1;
+    margin-bottom: 30px;
+  }
+
+  .contacts {
+    /* Stack contact cards vertically */
+    grid-template-columns: 1fr;
+    padding: 0 20px;
+    gap: 15px;
+  }
+
+  .ccard {
+    padding: 16px 20px;
+  }
+
+  .ccard .name {
+    font-size: 0.85rem;
+  }
+
+  .ccard .phone {
+    font-size: 0.75rem;
+  }
+
+  .social-links {
+    gap: 15px;
+    margin-top: 10px;
+  }
+
+  .social-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .org-logo-ring {
+    width: 100px;
+    height: 100px;
+  }
+
+  .sec-title {
+    font-size: 1.8rem;
+  }
+
+  .ccard .role {
+    font-size: 0.55rem;
+    letter-spacing: 2px;
+  }
+}

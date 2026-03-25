@@ -1,61 +1,102 @@
-index.html
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="#" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Titillium+Web:wght@300;400;600;700&family=Share+Tech+Mono&display=swap"
-      rel="stylesheet"
-    />
-    <title>DataXplore</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
-</html>
+/* ... [Keep all your existing desktop styles above] ... */
 
-main.jsx
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
+/* --- RESPONSIVE ADJUSTMENTS --- */
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
-
-App.jsx
-import React from "react";
-import Canvas from "./components/Canvas.jsx";
-import Navbar from "./components/Navbar.jsx";
-
-function App() {
-  return (
-    <>
-    <Navbar/>
-    <div>Hi</div>
-    </>
-  );
+@media (max-width: 1024px) {
+  .hero-logo-name-slot {
+    width: 90%; /* Scale down the wide name logo for tablets */
+    height: auto;
+    aspect-ratio: 4 / 1;
+  }
 }
 
-export default App;
+@media (max-width: 768px) {
+  #hero {
+    padding: 80px 20px 40px;
+  }
 
-Navbar.jsx
-import React from "react";
+  /* Scale down the rings so they don't cause overflow */
+  .ring:nth-child(1) { width: 280px; height: 280px; }
+  .ring:nth-child(2) { width: 450px; height: 450px; }
+  .ring:nth-child(3) { width: 600px; height: 600px; }
 
-function Navbar() {
-    
-    return(
-        <>Hi</>
-    );
+  .hero-logo-slot {
+    width: 180px;
+    height: 180px;
+  }
+
+  .hero-logo-name-slot {
+    width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+  }
+
+  .hero-chip {
+    font-size: 0.55rem;
+    letter-spacing: 2px;
+    padding: 5px 12px;
+  }
+
+  .hero-sub {
+    font-size: 0.85rem;
+    letter-spacing: 3px;
+  }
+
+  .hero-desc {
+    font-size: 1rem;
+    padding: 0 10px;
+  }
+
+  /* Stack stats in a grid on mobile */
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 0;
+    max-width: 400px;
+    margin: 0 auto 40px;
+  }
+
+  .hs-item {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: 10px 0;
+  }
+
+  /* Remove border from the last row */
+  .hs-item:nth-last-child(-n+2) {
+    border-bottom: none;
+  }
+
+  /* For odd number of items, center the last one */
+  .hs-item:last-child:nth-child(odd) {
+    grid-column: span 2;
+    border-bottom: none;
+  }
+
+  .hero-btns {
+    flex-direction: column;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+
+  .btn-primary, .btn-outline {
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 0.7rem;
+  }
 }
 
-export default Navbar;
-
+/* Very small devices */
+@media (max-width: 480px) {
+  .hero-stats {
+    grid-template-columns: 1fr; /* Single column for tiny screens */
+  }
+  .hs-item {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .hs-item:last-child {
+    border-bottom: none;
+  }
+}

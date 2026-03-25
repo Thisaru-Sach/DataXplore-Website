@@ -1,8 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Navbar.css";
 import data_name from "../assets/name_logo_1.png";
 
 function Navbar() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+    // Toggle a class on the body to prevent background scrolling
+    document.body.classList.toggle("menu-open");
+  };
+
+  const closeMenu = () => {
+    setIsOpen(false);
+    document.body.classList.remove("menu-open");
+  };
+
   return (
     <>
       <nav id="navbar">
@@ -18,29 +31,50 @@ function Navbar() {
             />
           </a>
         </div>
-        <ul className="nb-links">
+
+        {/* 3. Hamburger Button */}
+        <button
+          className={`nb-hamburger ${isOpen ? "active" : ""}`}
+          onClick={toggleMenu}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        {/* 4. Toggle class based on state */}
+        <ul className={`nb-links ${isOpen ? "nb-open" : ""}`}>
           <li>
-            <a href="#sec-about">About</a>
+            <a href="#sec-about" onClick={closeMenu}>
+              About
+            </a>
           </li>
           <li>
-            <a href="#sec-timeline">Timeline</a>
+            <a href="#sec-timeline" onClick={closeMenu}>
+              Timeline
+            </a>
           </li>
           <li>
-            <a href="#sec-structure">Structure</a>
+            <a href="#sec-structure" onClick={closeMenu}>
+              Structure
+            </a>
           </li>
           <li>
-            <a href="#sec-guidelines">Guidelines</a>
+            <a href="#sec-guidelines" onClick={closeMenu}>
+              Guidelines
+            </a>
           </li>
           <li>
-            <a href="#sec-organizers">Organizers</a>
+            <a href="#sec-organizers" onClick={closeMenu}>
+              Organizers
+            </a>
           </li>
-          {/* REPLACE THE # BELOW WITH YOUR GOOGLE FORM LINK  */}
           <li>
             <a
               href="https://tally.so/r/Np0kpG"
               target="_blank"
-              rel="noopener noreferrer"
               className="btn-reg"
+              onClick={closeMenu}
             >
               ⬡ Register
             </a>

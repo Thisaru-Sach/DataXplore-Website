@@ -51,3 +51,75 @@
   margin-bottom: 7px;
 }
 .acard p { color: var(--muted); font-size: 0.95rem; line-height: 1.55; }
+
+/* --- RESPONSIVE ADJUSTMENTS --- */
+
+@media (max-width: 1024px) {
+  .about-grid {
+    /* Reduce gap for tablets to save horizontal space */
+    gap: 32px;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-grid {
+    /* Stack the content: Text on top, Cards below */
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .about-body p {
+    font-size: 1rem;
+    line-height: 1.65;
+    /* Center text on mobile if you prefer, or keep left-aligned for readability */
+    text-align: left;
+  }
+
+  .about-pills {
+    justify-content: flex-start;
+    margin-top: 20px;
+  }
+
+  .pill {
+    font-size: 0.65rem;
+    padding: 4px 10px;
+  }
+
+  .about-cards {
+    /* Ensure cards take full width */
+    width: 100%;
+    gap: 12px;
+  }
+
+  .acard {
+    padding: 18px 20px;
+    /* On mobile, translate up looks better than translate right on hover */
+    transform: none;
+  }
+  
+  .acard:hover {
+    transform: translateY(-3px);
+  }
+
+  .acard h3 {
+    font-size: 0.7rem;
+  }
+
+  .acard p {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Final tweaks for very small screens */
+  .about-pills {
+    gap: 8px;
+  }
+  
+  .pill {
+    letter-spacing: 1px;
+    flex-grow: 1; /* Make pills fill the row for a cleaner look on tiny screens */
+    text-align: center;
+  }
+}

@@ -13,7 +13,7 @@
 }
 
 .nb-logo-name-slot {
-  width: 240px; height: 80px;
+  width: 220px; height: 80px;
   font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: 2px;
@@ -22,6 +22,7 @@
   align-items: center;
   gap: 8px;
 }
+
 .nb-logo .dx { color: var(--orange); }
 .nb-logo .ver {
   font-size: 0.55rem;
@@ -71,4 +72,71 @@
 .btn-reg:hover {
   box-shadow: var(--glow-o);
   transform: translateY(-1px);
+}
+
+/* --- RESPONSIVE STYLES --- */
+
+/* Hide hamburger by default on desktop */
+.nb-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 1000;
+  padding: 10px;
+}
+
+.nb-hamburger span {
+  display: block;
+  width: 25px;
+  height: 2px;
+  background-color: var(--cyan);
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 992px) {
+#navbar {
+    padding: 0 15px; /* Tighter padding for mobile */
+  }
+
+  .nb-hamburger {
+    display: flex; /* Show hamburger on mobile/tablet */
+    position: relative;
+    z-index: 1001;
+  }
+
+  /* Animate hamburger to 'X' when active */
+  .nb-hamburger.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+  .nb-hamburger.active span:nth-child(2) { opacity: 0; }
+  .nb-hamburger.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+  .nb-links {
+    position: fixed;
+    top: 0;
+    right: 0; /* Hide off-screen */
+    width: 260px;
+    height: 100vh;
+    background: rgba(1, 10, 22, 0.98);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
+    transform: translateX(100%); 
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(20px);
+    border-left: 1px solid var(--border);
+  }
+
+  .nb-links.nb-open {
+    transform: translateX(0);
+  }
+
+  .nb-logo-name-slot {
+    width: 150px; /* Scale down more for iPhone 6/7/8 widths */
+    height: 60px;
+    margin-left: 0px !important;
+    align-items: center;
+  }
 }
