@@ -67,7 +67,12 @@ function Hero() {
 
         <div className="hero-btns">
           {/* REPLACE # WITH YOUR GOOGLE FORM LINK  */}
-          <a href="#" target="_blank" className="btn-primary">
+          <a
+            href="https://tally.so/r/Np0kpG"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary"
+          >
             Register Your Team →
           </a>
           <a href="#sec-about" className="btn-outline">

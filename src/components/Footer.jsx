@@ -38,9 +38,7 @@ function Footer() {
           <div className="cp">
             © 2026 Statistics Society, USJ. All rights reserved.
             <br />
-            <a href="mailto:statsociety@sci.sjp.ac.lk">
-              statsociety@sci.sjp.ac.lk
-            </a>
+            Developed by TS CSA,USJ
           </div>
         </div>
       </footer>

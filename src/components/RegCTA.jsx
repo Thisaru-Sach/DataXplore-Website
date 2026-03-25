@@ -15,8 +15,9 @@ function RegCTA() {
         </p>
         {/* REPLACE # WITH YOUR GOOGLE FORM LINK */}
         <a
-          href="#"
+          href="https://tally.so/r/Np0kpG"
           target="_blank"
+          rel="noopener noreferrer"
           className="btn-primary"
           style={{fontSize:"0.85rem",padding:"16px 60px"}}
         >

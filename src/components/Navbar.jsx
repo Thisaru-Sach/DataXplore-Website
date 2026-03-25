@@ -8,14 +8,14 @@ function Navbar() {
       <nav id="navbar">
         <div className="nb-logo-name-slot" id="nb-logo-name-slot">
           <a href="#">
-          <img
-            src={data_name}
-            alt="DataXplore logo"
-            style={{ width: "100%", height: "100%", objectFit: "contain" }}
-            onError={(e) => {
-              e.currentTarget.style.display = "none";
-            }}
-          />
+            <img
+              src={data_name}
+              alt="DataXplore logo"
+              style={{ width: "100%", height: "100%", objectFit: "contain" }}
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
+            />
           </a>
         </div>
         <ul className="nb-links">
@@ -36,7 +36,12 @@ function Navbar() {
           </li>
           {/* REPLACE THE # BELOW WITH YOUR GOOGLE FORM LINK  */}
           <li>
-            <a href="#" className="btn-reg">
+            <a
+              href="https://tally.so/r/Np0kpG"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-reg"
+            >
               ⬡ Register
             </a>
           </li>
