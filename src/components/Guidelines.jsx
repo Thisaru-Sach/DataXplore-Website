@@ -24,7 +24,6 @@ function Guidelines() {
         }}
       >
         <div className="sec-wrap reveal">
-          <div className="sec-eyebrow">// 04 · Guidelines</div>
           <h2 className="sec-title">
             Rules & <span>Guidelines</span>
           </h2>

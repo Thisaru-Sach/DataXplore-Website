@@ -12,7 +12,7 @@ function Hero() {
         <div className="ring"></div>
 
         <div className="hero-chip">
-          STATISTICS SOCIETY &nbsp;·&nbsp; UNIVERSITY OF SRI JAYEWARDENEPURA
+          STATISTICS SOCIETY <br/> UNIVERSITY OF SRI JAYEWARDENEPURA
         </div>
 
         {/*  Event logo placeholder — swap the inner content with your <img> tag  */}

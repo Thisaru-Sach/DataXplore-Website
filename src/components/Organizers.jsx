@@ -8,9 +8,6 @@ function Organizers() {
     <>
       <div className="sec-divider" id="sec-organizers"></div>
       <div className="sec-wrap reveal">
-        <div className="sec-eyebrow" style={{ textAlign: "center" }}>
-          // 05 · Organizers
-        </div>
         <h2 className="sec-title" style={{ textAlign: "center" }}>
           Organized <span>By</span>
         </h2>

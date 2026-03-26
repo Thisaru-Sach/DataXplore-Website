@@ -20,7 +20,6 @@ function Timeline() {
       <div className="sec-divider" id="sec-timeline"></div>
       <div id="timeline-container">
         <div className="sec-wrap reveal">
-          <div className="sec-eyebrow">// 02 · Timeline</div>
           <h2 className="sec-title">
             Key <span>Dates</span>
           </h2>

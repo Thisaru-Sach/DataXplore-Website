@@ -6,7 +6,6 @@ function Structure() {
     <>
       <div className="sec-divider" id="sec-structure"></div>
       <div className="sec-wrap reveal">
-        <div className="sec-eyebrow">// 03 · Competition Structure</div>
         <h2 className="sec-title">
           Competition <span>Stages</span>
         </h2>

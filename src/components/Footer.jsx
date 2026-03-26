@@ -38,7 +38,7 @@ function Footer() {
           <div className="cp">
             © 2026 Statistics Society, USJ. All rights reserved.
             <br />
-            Developed by TS CSA,USJ
+            Developed by Thisaru Sachintha, Department of Computer Science,USJ
           </div>
         </div>
       </footer>

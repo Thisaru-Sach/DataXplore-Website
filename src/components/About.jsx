@@ -6,7 +6,6 @@ function About() {
     <>
       <div className="sec-divider" id="sec-about"></div>
       <div className="sec-wrap reveal">
-        <div className="sec-eyebrow">// 01 · About</div>
         <h2 className="sec-title">
           What is <span>DataXplore?</span>
         </h2>
