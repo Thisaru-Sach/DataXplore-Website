@@ -1,0 +1,113 @@
+/* src/components/submission/SubmissionBanner.css */
+
+.sub-banner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: 0 48px;
+  margin: 0 auto;
+}
+
+.sub-banner__inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px 28px;
+  border: 1px solid var(--border);
+  background: rgba(2, 20, 40, 0.82);
+  flex-wrap: wrap;
+}
+
+/* ── Left side ────────────────────────── */
+.sub-banner__left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.sub-banner__icon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.sub-banner__label {
+  font-family: var(--ff-mono);
+  font-size: 0.62rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.sub-banner__text {
+  font-family: var(--ff-body);
+  font-size: 0.95rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* ── Colour variants ──────────────────── */
+.sub-banner--open   .sub-banner__label { color: var(--cyan2); }
+.sub-banner--open   .sub-banner__inner { border-color: rgba(0, 200, 240, 0.35); }
+
+.sub-banner--closed .sub-banner__label { color: var(--muted); }
+.sub-banner--closed .sub-banner__inner { border-color: rgba(95, 154, 184, 0.25); }
+
+.sub-banner--waiting .sub-banner__label { color: var(--orange); }
+.sub-banner--waiting .sub-banner__inner { border-color: rgba(245, 162, 0, 0.3); }
+
+.sub-banner--info   .sub-banner__label { color: #f0c040; }
+.sub-banner--info   .sub-banner__inner {
+  border-color: rgba(240, 192, 64, 0.4);
+  background: rgba(40, 30, 2, 0.7);
+}
+
+/* ── CTA button ───────────────────────── */
+.sub-banner__btn {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  background: linear-gradient(135deg, var(--orange), var(--orange2));
+  color: #000;
+  font-family: var(--ff-head);
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 10px 28px;
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  transition: box-shadow 0.25s, transform 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.sub-banner__btn:hover {
+  box-shadow: var(--glow-o);
+  transform: translateY(-1px);
+}
+
+/* ── Responsive ───────────────────────── */
+@media (max-width: 900px) {
+  .sub-banner {
+    padding: 0 20px;
+  }
+
+  .sub-banner__inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 20px;
+  }
+
+  .sub-banner__right {
+    width: 100%;
+  }
+
+  .sub-banner__btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

@@ -32,7 +32,6 @@ function About() {
             </p>
             <div className="about-pills">
               <span className="pill">Data Analysis</span>
-              <span className="pill">Machine Learning</span>
               <span className="pill">Dashboards</span>
               <span className="pill">Storytelling</span>
               <span className="pill">Model Explainability</span>

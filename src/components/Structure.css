@@ -54,6 +54,35 @@
 }
 .stage ul li strong { color: var(--white); font-weight: 600; }
 
+.stage-status {
+  display: inline-block;
+  margin-left: 10px;
+  font-family: var(--ff-mono);
+  font-size: 0.58rem;
+  letter-spacing: 1px;
+  padding: 2px 8px;
+  border-radius: 2px;
+  vertical-align: middle;
+}
+ 
+.stage-status--open {
+  background: rgba(0, 200, 100, 0.12);
+  color: #40d080;
+  border: 1px solid rgba(0, 200, 100, 0.3);
+}
+ 
+.stage-status--upcoming {
+  background: rgba(245, 162, 0, 0.1);
+  color: var(--orange);
+  border: 1px solid rgba(245, 162, 0, 0.28);
+}
+ 
+.stage-status--closed {
+  background: rgba(95, 154, 184, 0.1);
+  color: var(--muted);
+  border: 1px solid rgba(95, 154, 184, 0.22);
+}
+
 /* --- RESPONSIVE DESIGN --- */
 
 @media (max-width: 1024px) {

@@ -1,0 +1,107 @@
+/* src/pages/Submit.css */
+
+.submit-page {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px 40px; /* top pad clears navbar if you add one */
+}
+
+/* ── Closed screen ───────────────────────────────────────── */
+.closed-screen {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closed-card {
+  background: rgba(2, 20, 40, 0.88);
+  border: 1px solid rgba(0, 200, 240, 0.2);
+  padding: 56px 48px;
+  max-width: 520px;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.closed-icon {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.closed-title {
+  font-family: var(--ff-head);
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+.closed-body {
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.closed-sub {
+  font-family: var(--ff-mono);
+  font-size: 0.75rem;
+  color: var(--cyan);
+  letter-spacing: 2px;
+}
+
+/* ── Shared button styles (used in closed screen + portal) ── */
+.btn-primary-sub {
+  display: inline-block;
+  text-decoration: none;
+  background: linear-gradient(135deg, var(--orange), var(--orange2));
+  color: #000;
+  font-family: var(--ff-head);
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 13px 40px;
+  clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+  transition: box-shadow 0.25s, transform 0.2s;
+  margin-top: 8px;
+}
+.btn-primary-sub:hover {
+  box-shadow: var(--glow-o);
+  transform: translateY(-2px);
+}
+
+.btn-outline-sub {
+  display: inline-block;
+  text-decoration: none;
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  font-family: var(--ff-head);
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 11px 36px;
+  clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+  transition: background 0.25s, box-shadow 0.25s, transform 0.2s;
+  margin-top: 4px;
+}
+.btn-outline-sub:hover {
+  background: rgba(0, 200, 240, 0.1);
+  box-shadow: var(--glow-c);
+  transform: translateY(-2px);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .closed-card {
+    padding: 40px 24px;
+  }
+}

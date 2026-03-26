@@ -10,6 +10,23 @@
   padding: 100px 40px 60px;
 }
 
+.btn-primary--disabled {
+  /* Same shape as .btn-primary but greyed out, not clickable */
+  display: inline-block;
+  background: rgba(95, 154, 184, 0.2);
+  color: var(--muted) !important;
+  font-family: var(--ff-head);
+  font-weight: 700;
+  font-size: inherit;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 15px 48px;
+  clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+  border: 1px solid rgba(95, 154, 184, 0.25);
+  cursor: not-allowed;
+  user-select: none;
+}
+
 @media (max-width: 768px) {
   #hero {
     padding: 80px 20px 40px;

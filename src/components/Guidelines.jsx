@@ -1,5 +1,6 @@
 import React, { useEffect, useEffectEvent } from "react";
 import "./Guidelines.css";
+import { DATES, fmt } from "../config/dates";
 
 function Guidelines() {
   function showTab(btn, id) {
@@ -64,9 +65,10 @@ function Guidelines() {
           <div id="g-reg" className="tab-pane active">
             <ul className="gl-list">
               <li>
-                <span className="n">01</span>Participants can be <strong>second, third and fourth-year</strong> undergraduates
-                of <strong>state and private universities</strong> and students
-                at other educational institutes.
+                <span className="n">01</span>Participants can be{" "}
+                <strong>second, third and fourth-year</strong> undergraduates of{" "}
+                <strong>state and private universities</strong> and students at
+                other educational institutes.
               </li>
               <li>
                 <span className="n">02</span>A team should consist of a{" "}
@@ -74,7 +76,8 @@ function Guidelines() {
                 <strong>maximum of 4 members</strong>.
               </li>
               <li>
-                <span className="n">03</span>For all stages, <strong>all team members</strong> must actively participate.
+                <span className="n">03</span>For all stages,{" "}
+                <strong>all team members</strong> must actively participate.
               </li>
               <li>
                 <span className="n">04</span>All team members must be from the{" "}
@@ -86,28 +89,44 @@ function Guidelines() {
                 status by submitting a{" "}
                 <strong>scanned copy of their university ID</strong>.
               </li>
+              <li>
+                <span className="n">06</span>
+                Registration is open from{" "}
+                <strong>{fmt(DATES.registrationOpen, "long")}</strong> to{" "}
+                <strong>{fmt(DATES.registrationClose, "long")}</strong>.
+              </li>
             </ul>
           </div>
 
           <div id="g-quiz" className="tab-pane">
             <ul className="gl-list">
               <li>
-                <span className="n">01</span><strong>AI tools are strictly prohibited</strong> (e.g., ChatGPT, Copilot) for analysis, dashboard creation, or report writing.
+                <span className="n">01</span>
+                <strong>AI tools are strictly prohibited</strong> (e.g.,
+                ChatGPT, Copilot) for analysis, dashboard creation, or report
+                writing.
               </li>
               <li>
-                <span className="n">02</span>Detection of AI usage may lead to <strong>immediate disqualification</strong>.
+                <span className="n">02</span>Detection of AI usage may lead to{" "}
+                <strong>immediate disqualification</strong>.
               </li>
               <li>
-                <span className="n">03</span>All work must be original and completed solely by the team members using <strong>permitted platforms</strong>.
+                <span className="n">03</span>All work must be original and
+                completed solely by the team members using{" "}
+                <strong>permitted platforms</strong>.
               </li>
               <li>
-                <span className="n">04</span>Participants must report to the venue by <strong>9:30 a.m.</strong> on physical competition days.
+                <span className="n">04</span>Participants must report to the
+                venue by <strong>9:30 a.m.</strong> on physical competition
+                days.
               </li>
               <li>
-                <span className="n">05</span>All decisions made by the evaluators are <strong>final</strong> and not subject to change.
+                <span className="n">05</span>All decisions made by the
+                evaluators are <strong>final</strong> and not subject to change.
               </li>
               <li>
-                <span className="n">06</span>A <strong>smart casual</strong> dress code is encouraged for all participants.
+                <span className="n">06</span>A <strong>smart casual</strong>{" "}
+                dress code is encouraged for all participants.
               </li>
             </ul>
           </div>
@@ -115,19 +134,33 @@ function Guidelines() {
           <div id="g-prelim" className="tab-pane">
             <ul className="gl-list">
               <li>
-                <span className="n">01</span><strong>Stage 1 (Online):</strong> Analyze an ethically sourced dataset (500–5,000 records) on public health, environment, or economics.
+                <span className="n">01</span>
+                <strong>Stage 1 (Online):</strong> Analyze an ethically sourced
+                dataset (500–5,000 records) on public health, environment, or
+                economics.
               </li>
               <li>
-                <span className="n">02</span>Submissions must include a <strong>PDF report</strong>, the dataset used, and all scripts/code.
+                <span className="n">02</span>Submissions must include a{" "}
+                <strong>PDF report</strong>, the dataset used, and all
+                scripts/code.
               </li>
               <li>
-                <span className="n">03</span>Deadline for Stage 1: <strong>24th April 2026 before 12.00 noon</strong>.
+                <span className="n">03</span>Deadline for Stage 1:{" "}
+                <strong>
+                  {fmt(DATES.stage1Close, "long")} before 12:00 noon
+                </strong>
+                .
               </li>
               <li>
-                <span className="n">04</span><strong>Stage 2 (Online):</strong> Mandatory workshop on 3rd May 2026 (1.00pm - 4.00pm) focused on dashboard standards.
+                <span className="n">04</span>
+                <strong>Stage 2 (Online):</strong> Mandatory workshop on{" "}
+                <strong>{fmt(DATES.workshopDate, "long")}</strong>(1.00pm -
+                4.00pm) focused on dashboard standards.
               </li>
               <li>
-                <span className="n">05</span>The <strong>top 10 teams</strong> are selected after Stage 2 to advance based on analytical excellence.
+                <span className="n">05</span>The <strong>top 10 teams</strong>{" "}
+                are selected after Stage 2 to advance based on analytical
+                excellence.
               </li>
             </ul>
           </div>
@@ -135,19 +168,30 @@ function Guidelines() {
           <div id="g-inter" className="tab-pane">
             <ul className="gl-list">
               <li>
-                <span className="n">01</span><strong>Stage 3 (Physical):</strong> Dashboard competition held at the <strong>BLC, Faculty of Applied Sciences, USJ</strong>.
+                <span className="n">01</span>
+                <strong>Stage 3 (Physical):</strong> Dashboard competition held
+                at the <strong>BLC, Faculty of Applied Sciences, USJ</strong>.
               </li>
               <li>
-                <span className="n">02</span>This is a <strong>closed-book</strong> competition; no external resources are permitted during the task.
+                <span className="n">02</span>This is a{" "}
+                <strong>closed-book</strong> competition; no external resources
+                are permitted during the task.
               </li>
               <li>
-                <span className="n">03</span>The <strong>top 5 teams</strong> will be selected based on visualization quality and analytical depth.
+                <span className="n">03</span>The <strong>top 5 teams</strong>{" "}
+                will be selected based on visualization quality and analytical
+                depth.
               </li>
               <li>
-                <span className="n">04</span><strong>Stage 4 (Finals):</strong> Top 5 teams deliver presentations to judges on 17th May 2026.
+                <span className="n">04</span>
+                <strong>Stage 4 (Finals):</strong> Top 5 teams deliver
+                presentations to judges on{" "}
+                <strong>{fmt(DATES.presentations, "long")}</strong>.
               </li>
               <li>
-                <span className="n">05</span>Presentations must showcase the dashboard, methodology, and <strong>key actionable insights</strong>.
+                <span className="n">05</span>Presentations must showcase the
+                dashboard, methodology, and{" "}
+                <strong>key actionable insights</strong>.
               </li>
             </ul>
           </div>
@@ -155,19 +199,29 @@ function Guidelines() {
           <div id="g-tech" className="tab-pane">
             <ul className="gl-list">
               <li>
-                <span className="n">01</span><strong>Permitted Tools:</strong> Minitab, R, SPSS, Python, or other analytical platforms/programming environments.
+                <span className="n">01</span>
+                <strong>Permitted Tools:</strong> Minitab, R, SPSS, Python, or
+                other analytical platforms/programming environments.
               </li>
               <li>
-                <span className="n">02</span><strong>Evaluation Criteria:</strong> Includes accuracy, clarity of insights, technical proficiency, and data storytelling.
+                <span className="n">02</span>
+                <strong>Evaluation Criteria:</strong> Includes accuracy, clarity
+                of insights, technical proficiency, and data storytelling.
               </li>
               <li>
-                <span className="n">03</span><strong>Certification:</strong> All participants receive <strong>e-certificates</strong> for participation.
+                <span className="n">03</span>
+                <strong>Certification:</strong> All participants receive{" "}
+                <strong>e-certificates</strong> for participation.
               </li>
               <li>
-                <span className="n">04</span><strong>Stage 4 Rewards:</strong> Champion: LKR 30,000; 1st Runner-up: LKR 20,000; 2nd Runner-up: LKR 10,000.
+                <span className="n">04</span>
+                <strong>Stage 4 Rewards:</strong> Champion: LKR 30,000; 1st
+                Runner-up: LKR 20,000; 2nd Runner-up: LKR 10,000.
               </li>
               <li>
-                <span className="n">05</span>Award ceremony takes place during <strong>Statistics Day</strong> on 4th June 2026.
+                <span className="n">05</span>Award ceremony takes place during{" "}
+                <strong>Statistics Day</strong> on{" "}
+                <strong>{fmt(DATES.statDay, "long")}</strong>.
               </li>
             </ul>
           </div>

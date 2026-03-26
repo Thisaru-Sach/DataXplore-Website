@@ -3,7 +3,15 @@ import "./Hero.css";
 import data_logo from "../assets/logo_only.png";
 import data_name from "../assets/name_logo_1.png";
 
+import { DATES, getPhase, fmt } from "../config/dates";
+
 function Hero() {
+
+  const phase = getPhase();
+  const regOpen =
+    phase === "bypass" ||
+    phase === "reg_open";
+
   return (
     <>
       <section id="hero">
@@ -44,11 +52,11 @@ function Hero() {
 
         <div className="hero-stats">
           <div className="hs-item">
-            <span className="val">28 Mar</span>
+             <span className="val">{fmt(DATES.registrationOpen,  "short")}</span>
             <span className="lbl">Reg Opens</span>
           </div>
           <div className="hs-item">
-            <span className="val">8 Apr</span>
+             <span className="val">{fmt(DATES.registrationClose, "short")}</span>
             <span className="lbl">Reg Closes</span>
           </div>
           <div className="hs-item">
@@ -67,14 +75,21 @@ function Hero() {
 
         <div className="hero-btns">
           {/* REPLACE # WITH YOUR GOOGLE FORM LINK  */}
-          <a
-            href="https://tally.so/r/Np0kpG"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-primary"
-          >
-            Register Your Team →
-          </a>
+          {regOpen ? (
+            <a
+              href="https://tally.so/r/Np0kpG"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary"
+            >
+              Register Your Team →
+            </a>
+          ) : (
+            // Registration closed — show a disabled/greyed button with deadline info
+            <span className="btn-primary btn-primary--disabled">
+              Registration Closed
+            </span>
+          )}
           <a href="#sec-about" className="btn-outline">
             Learn More
           </a>
