@@ -54,6 +54,10 @@
 }
 .stage ul li strong { color: var(--white); font-weight: 600; }
 
+.prize-positions{
+  width: 120px;
+}
+
 /* --- RESPONSIVE DESIGN --- */
 
 @media (max-width: 1024px) {
