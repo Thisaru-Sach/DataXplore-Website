@@ -65,7 +65,7 @@ function Organizers() {
               statsociety@sci.sjp.ac.lk
             </a>
             <a
-              href="https://science.sjp.ac.lk/sta/statistics-society/"
+              href="https://science.sjp.ac.lk/statsoc/"
               className="social-btn"
             >
               <svg
