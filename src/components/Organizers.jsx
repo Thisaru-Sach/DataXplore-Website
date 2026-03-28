@@ -37,15 +37,6 @@ function Organizers() {
 
           <div className="contacts">
             <div className="ccard">
-              <div className="role">Senior Treasurer</div>
-              <div className="name">
-                Dr. Chathuri Jayasinghe
-                <br />
-                (Senior Lecturer)
-              </div>
-              <div className="phone">chathuri@sjp.ac.lk</div>
-            </div>
-            <div className="ccard">
               <div className="role">President</div>
               <div className="name">Ms. Anuradha Perera</div>
               <div className="phone">077 455 1017</div>
