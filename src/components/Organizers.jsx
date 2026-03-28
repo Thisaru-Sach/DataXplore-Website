@@ -43,7 +43,7 @@ function Organizers() {
                 <br />
                 (Senior Lecturer)
               </div>
-              <div className="phone">076 288 0394</div>
+              <div className="phone">chathuri@sjp.ac.lk</div>
             </div>
             <div className="ccard">
               <div className="role">President</div>

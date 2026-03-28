@@ -18,7 +18,7 @@ function Structure() {
                 Analyze an ethically sourced dataset of <strong>500–5,000 records</strong>.
               </li>
               <li>
-                Submit a <strong>PDF report</strong>, dataset, and analysis scripts/code.
+                Submit a folder including a pdf report, dataset and analysis scripts.
               </li>
               <li>
                 Tools: Minitab, R, SPSS, Python, or other analytical platforms.
@@ -37,13 +37,13 @@ function Structure() {
                 <strong>Mandatory</strong> session for all registered teams.
               </li>
               <li>
-                Delivered by <strong>Statistics Society alumni</strong> and industry experts.
+                Delivered by industry and academic experts.
               </li>
               <li>
                 Focuses on professional dashboard creation and standards.
               </li>
               <li>
-                Held on <strong>3rd May 2026</strong> (1.00pm – 4.00pm); Top 10 teams advance.
+                Held on <strong>3rd May 2026</strong>
               </li>
             </ul>
           </div>
@@ -59,7 +59,7 @@ function Structure() {
                 Transform a new dataset into an <strong>interactive dashboard</strong>.
               </li>
               <li>
-                <strong>Closed-book:</strong> No external resources allowed during the task.
+                <strong>Open-book:</strong> Participants are allowed to refer any external resource.
               </li>
               <li>
                 Held on <strong>10th May 2026</strong>; Top 5 teams reach the finals.

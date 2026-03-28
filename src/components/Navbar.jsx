@@ -71,7 +71,7 @@ function Navbar() {
           </li>
           <li>
             <a
-              href="https://tally.so/r/Np0kpG"
+              href="https://tally.so/r/dWPLVD"
               target="_blank"
               className="btn-reg"
               onClick={closeMenu}

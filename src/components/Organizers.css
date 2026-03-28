@@ -5,7 +5,7 @@
   border-radius: 50%;
   border: 2px solid var(--cyan);
   box-shadow: 0 0 32px rgba(0,200,240,.25), inset 0 0 20px rgba(0,200,240,.05);
-  background: rgba(2,20,40,.8);
+  background: white;
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
   margin: 0 auto 20px;
