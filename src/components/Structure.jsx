@@ -100,6 +100,9 @@ function Structure() {
               <li>
                 Fianl presenations on <strong>17th May 2026</strong>.
               </li>
+              <li>
+                Fianl presenations on <strong>17th May 2026</strong>.
+              </li>
             </ul>
           </div>
 
