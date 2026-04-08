@@ -9,7 +9,7 @@
 //  Set to false before going live.
 // ─────────────────────────────────────────────────────────
 
-export const BYPASS_DATE_CHECK = false; //  flip to false for production
+export const BYPASS_DATE_CHECK = true; //  flip to false for production
 
 export const DATES = {
   registrationOpen:  new Date("2026-03-28T00:00:00"),
