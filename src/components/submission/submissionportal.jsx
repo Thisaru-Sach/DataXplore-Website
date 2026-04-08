@@ -14,7 +14,7 @@ import { useState, useRef, useCallback } from "react";
 import { Link }                           from "react-router-dom";
 import JSZip                              from "jszip";
 import { uploadFile, saveSubmission, getTeamSubmissions } from "../../lib/supabase";
-import "./SubmissionPortal.css";
+import "./Submissionportal.css";
 
 const ACCEPTED_EXT    = [".pdf", ".xls", ".xlsx", ".R", ".r", ".rmd", ".Rmd", ".ipynb", ".py", ".csv", ".mtw", ".mtj", ".txt"];
 const MAX_FILE_SIZE_MB = 50;

@@ -3,7 +3,7 @@ import { useState }          from "react";
 import { Link }              from "react-router-dom";
 import { BYPASS_DATE_CHECK } from "../../config/dates";
 import { verifyTeam }        from "../../lib/teamAuth";
-import "./AuthGate.css";
+import "./Authgate.css";
 
 export default function AuthGate({ onAuthenticated, stage }) {
   const [regNumber, setRegNumber] = useState("");
