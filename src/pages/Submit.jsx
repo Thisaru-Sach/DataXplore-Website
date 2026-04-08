@@ -9,10 +9,10 @@
 // ─────────────────────────────────────────────────────────
 import { useState }        from "react";
 import { Link }            from "react-router-dom";
-import { getPhase, BYPASS_DATE_CHECK, DATES } from "../config/dates";
-import AuthGate            from "../components/submission/AuthGate";
-import SubmissionPortal    from "../components/submission/SubmissionPortal";
-import Canvas              from "../components/Canvas";
+import { getPhase, BYPASS_DATE_CHECK, DATES } from "../config/dates.js";
+import AuthGate            from "../components/submission/AuthGate.jsx";
+import SubmissionPortal    from "../components/submission/SubmissionPortal.jsx";
+import Canvas              from "../components/Canvas.jsx";
 import "./Submit.css";
 
 export default function Submit() {

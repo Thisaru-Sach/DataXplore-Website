@@ -66,8 +66,8 @@ function Guidelines() {
             <ul className="gl-list">
               <li>
                 <span className="n">01</span>Participants can be undergraduates{" "}
-                of state and private universities and students at other
-                educational institutes.
+                of state and private universities and students 
+                at other educational institutes.
               </li>
               <li>
                 <span className="n">02</span>A team should consist of a{" "}
