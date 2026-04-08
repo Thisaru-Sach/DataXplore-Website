@@ -2,8 +2,15 @@ import React, { useState } from "react";
 import "./Navbar.css";
 import data_name from "../assets/name_logo_1.png";
 
+import { DATES, getPhase, fmt } from "../config/dates";
+
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+
+  const phase = getPhase();
+    const regOpen =
+      phase === "bypass" ||
+      phase === "reg_open";
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -70,14 +77,22 @@ function Navbar() {
             </a>
           </li>
           <li>
+            {regOpen ? (
             <a
-              href="https://tally.so/r/Np0kpG"
+              href="https://tally.so/r/dWPLVD"
               target="_blank"
+              rel="noopener noreferrer"
               className="btn-reg"
               onClick={closeMenu}
             >
-              ⬡ Register
+              ⬡ Register 
             </a>
+          ) : (
+            // Registration closed — show a disabled/greyed button with deadline info
+            <span className="btn-reg btn-reg--disabled">
+              Registration Closed
+            </span>
+          )}
           </li>
         </ul>
       </nav>

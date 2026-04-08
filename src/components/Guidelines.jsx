@@ -65,10 +65,9 @@ function Guidelines() {
           <div id="g-reg" className="tab-pane active">
             <ul className="gl-list">
               <li>
-                <span className="n">01</span>Participants can be{" "}
-                <strong>second, third and fourth-year</strong> undergraduates of{" "}
-                <strong>state and private universities</strong> and students at
-                other educational institutes.
+                <span className="n">01</span>Participants can be undergraduates{" "}
+                of state and private universities and students at other
+                educational institutes.
               </li>
               <li>
                 <span className="n">02</span>A team should consist of a{" "}
@@ -101,31 +100,27 @@ function Guidelines() {
           <div id="g-quiz" className="tab-pane">
             <ul className="gl-list">
               <li>
-                <span className="n">01</span>
-                <strong>AI tools are strictly prohibited</strong> (e.g.,
-                ChatGPT, Copilot) for analysis, dashboard creation, or report
-                writing.
+                <span className="n">01</span>Limited AI use permitted for
+                technical analysis and dashboarding only. AI is strictly
+                prohibited for report writing; all text must be original and
+                explainable by the team.
               </li>
               <li>
-                <span className="n">02</span>Detection of AI usage may lead to{" "}
-                <strong>immediate disqualification</strong>.
-              </li>
-              <li>
-                <span className="n">03</span>All work must be original and
+                <span className="n">02</span>All work must be original and
                 completed solely by the team members using{" "}
                 <strong>permitted platforms</strong>.
               </li>
               <li>
-                <span className="n">04</span>Participants must report to the
+                <span className="n">03</span>Participants must report to the
                 venue by <strong>9:30 a.m.</strong> on physical competition
                 days.
               </li>
               <li>
-                <span className="n">05</span>All decisions made by the
+                <span className="n">04</span>All decisions made by the
                 evaluators are <strong>final</strong> and not subject to change.
               </li>
               <li>
-                <span className="n">06</span>A <strong>smart casual</strong>{" "}
+                <span className="n">05</span>A <strong>smart casual</strong>{" "}
                 dress code is encouraged for all participants.
               </li>
             </ul>
@@ -140,9 +135,8 @@ function Guidelines() {
                 economics.
               </li>
               <li>
-                <span className="n">02</span>Submissions must include a{" "}
-                <strong>PDF report</strong>, the dataset used, and all
-                scripts/code.
+                <span className="n">02</span>Submissions must include a folder
+              including a pdf report, dataset and analysis scripts.
               </li>
               <li>
                 <span className="n">03</span>Deadline for Stage 1:{" "}
@@ -154,8 +148,8 @@ function Guidelines() {
               <li>
                 <span className="n">04</span>
                 <strong>Stage 2 (Online):</strong> Mandatory workshop on{" "}
-                <strong>{fmt(DATES.workshopDate, "long")}</strong>(1.00pm -
-                4.00pm) focused on dashboard standards.
+                <strong>{fmt(DATES.workshopDate, "long")}</strong> focused on
+                dashboard standards.
               </li>
               <li>
                 <span className="n">05</span>The <strong>top 10 teams</strong>{" "}

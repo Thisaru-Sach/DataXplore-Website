@@ -1,0 +1,15 @@
+# supabase/config.toml
+# Supabase CLI project config — needed to deploy Edge Functions
+# Install CLI:  npm install -g supabase
+# Login:        supabase login
+# Link project: supabase link --project-ref YOUR_PROJECT_REF
+
+[api]
+enabled = true
+port = 54321
+
+[db]
+port = 54322
+
+[functions.team-auth]
+verify_jwt = false   # We do our own verification inside the function

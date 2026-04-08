@@ -41,7 +41,7 @@ function Structure() {
                 Analyze an ethically sourced dataset of <strong>500–5,000 records</strong>.
               </li>
               <li>
-                Submit a <strong>PDF report</strong>, dataset, and analysis scripts/code.
+                Submit a folder including a pdf report, dataset and analysis scripts.
               </li>
               <li>
                 Tools: Minitab, R, SPSS, Python, or other analytical platforms.
@@ -64,14 +64,14 @@ function Structure() {
                 <strong>Mandatory</strong> session for all registered teams.
               </li>
               <li>
-                Delivered by <strong>Statistics Society alumni</strong> and industry experts.
+                Delivered by industry and academic experts.
               </li>
               <li>
                 Focuses on professional dashboard creation and standards.
               </li>
               <li>
                 Held on {" "}
-                <strong>{fmt(DATES.workshopDate, "long")} (1.00 pm – 4.00 pm)</strong>; Top 10 teams advance.
+                <strong>{fmt(DATES.workshopDate, "long")}</strong>
               </li>
             </ul>
           </div>
@@ -91,11 +91,14 @@ function Structure() {
                 Transform a new dataset into an{" "}<strong>interactive dashboard</strong>.
               </li>
               <li>
-                <strong>Closed-book:</strong> No external resources allowed during the task.
+                <strong>Open-book:</strong> Participants are allowed to refer any external resource.
               </li>
               <li>
                 Held on{" "}
                 <strong>{fmt(DATES.stage3Close, "long")}</strong>; Top 5 teams reach the finals.
+              </li>
+              <li>
+                Fianl presenations on <strong>17th May 2026</strong>.
               </li>
             </ul>
           </div>
@@ -109,20 +112,32 @@ function Structure() {
             <h3>Stat Day & Award Ceremony</h3>
             <ul>
               <li>
-                Top 5 present to judges on{" "}
-                <strong>{fmt(DATES.presentations, "long")}</strong>.
-              </li>
-              <li>
                 Demonstrate methodology, design choices, and{" "}<strong>data storytelling</strong>.
               </li>
               <li>
                 Winners recognized at{" "}
                 <strong>
-                  Stat Day & Award Ceremony ({fmt(DATES.statDay, "long")})
+                  Stat Day & Award Ceremony {fmt(DATES.statDay, "long")}
                 </strong>.
               </li>
               <li>
-                Prizes for Champion team, 1st Runner up, 2nd Runner up -{" "}<strong>LKR 30,000.00, LKR 20,000.00, LKR 10,000.00</strong>{" "}respectively.
+                Prizes<br/> 
+                <table>
+                  <tbody>
+                    <tr>
+                      <td className="prize-positions"> Champion team</td>
+                      <td> <strong>LKR 30,000.00</strong></td>
+                    </tr>
+                    <tr>
+                      <td className="prize-positions"> 1st Runner up</td>
+                      <td> <strong>LKR 20,000.00</strong></td>
+                    </tr>
+                    <tr>
+                      <td className="prize-positions"> 2nd Runner up</td>
+                      <td> <strong>LKR 10,000.00</strong></td>
+                    </tr>
+                  </tbody>
+                </table>
               </li>
             </ul>
           </div>

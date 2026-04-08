@@ -37,15 +37,6 @@ function Organizers() {
 
           <div className="contacts">
             <div className="ccard">
-              <div className="role">Senior Treasurer</div>
-              <div className="name">
-                Dr. Chathuri Jayasinghe
-                <br />
-                (Senior Lecturer)
-              </div>
-              <div className="phone">076 288 0394</div>
-            </div>
-            <div className="ccard">
               <div className="role">President</div>
               <div className="name">Ms. Anuradha Perera</div>
               <div className="phone">077 455 1017</div>
@@ -65,7 +56,7 @@ function Organizers() {
               statsociety@sci.sjp.ac.lk
             </a>
             <a
-              href="https://science.sjp.ac.lk/sta/statistics-society/"
+              href="https://science.sjp.ac.lk/statsoc/"
               className="social-btn"
             >
               <svg
@@ -80,7 +71,7 @@ function Organizers() {
                 <line x1="2" y1="12" x2="22" y2="12"></line>
                 <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
               </svg>
-              statsociety@sci.sjp.ac.lk
+              Web
             </a>
             {/* REPLACE # WITH ACTUAL LINKEDIN URL */}
             <a

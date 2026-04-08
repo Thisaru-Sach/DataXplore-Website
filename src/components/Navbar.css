@@ -69,6 +69,24 @@
   clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
   transition: box-shadow .25s, transform .2s;
 }
+
+.btn-reg--disabled {
+  /* Same shape as .btn-primary but greyed out, not clickable */
+  display: inline-block;
+  background: rgba(95, 154, 184, 0.2);
+  color: var(--muted) !important;
+  font-family: var(--ff-head);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 9px 24px;
+  clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+  border: 1px solid rgba(95, 154, 184, 0.25);
+  cursor: not-allowed;
+  user-select: none;
+}
+
 .btn-reg:hover {
   box-shadow: var(--glow-o);
   transform: translateY(-1px);

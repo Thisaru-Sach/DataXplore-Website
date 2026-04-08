@@ -10,7 +10,7 @@ function RegCTA() {
   const regOpen = phase === "bypass" || phase === "reg_open";
 
   // Has registration not opened yet?
-  const regNotYet = now < DATES.registrationOpen;
+  const regNotYet = now < DATES.registrationOpen; 
 
   return (
     <>
@@ -55,7 +55,7 @@ function RegCTA() {
         {/* REPLACE # WITH YOUR GOOGLE FORM LINK */}
         {regOpen ? (
           <a
-            href="https://tally.so/r/Np0kpG"
+            href="https://tally.so/r/dWPLVD"
             target="_blank"
             rel="noopener noreferrer"
             className="btn-primary"

@@ -1,137 +1,174 @@
 // src/components/submission/SubmissionPortal.jsx
 // ─────────────────────────────────────────────────────────
-//  Shown after AuthGate confirms the team.
-//  Accepts: R scripts, R Markdown, Jupyter Notebooks,
-//           Excel, Minitab, PDF, CSV
+//  Full Supabase-connected upload portal.
+//  Flow:
+//    1. User selects files (drag & drop or browse)
+//    2. On submit: all valid files are zipped client-side
+//       using the JSZip library (no server needed)
+//    3. The zip is uploaded to Supabase Storage
+//    4. Metadata (path, size, stage, team) saved to DB
 //
-//  Files are currently stored in component state only.
-//  TODO: wire up Supabase Storage upload when DB is ready.
+//  Requires:  npm install jszip
 // ─────────────────────────────────────────────────────────
 import { useState, useRef, useCallback } from "react";
 import { Link }                           from "react-router-dom";
+import JSZip                              from "jszip";
+import { uploadFile, saveSubmission, getTeamSubmissions } from "../../lib/supabase";
 import "./SubmissionPortal.css";
 
-// Accepted file types
-const ACCEPTED = {
-  "application/pdf":                          [".pdf"],
-  "application/vnd.ms-excel":                [".xls"],
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
-  "text/plain":                               [".r", ".R", ".rmd", ".Rmd", ".txt"],
-  "application/octet-stream":                 [".rmd", ".Rmd", ".mtw", ".mtj"],
-  "application/x-ipynb+json":               [".ipynb"],
-  "text/x-python":                            [".py"],
-};
-
-const ACCEPTED_EXT = [".pdf", ".xls", ".xlsx", ".R", ".r", ".rmd", ".Rmd", ".ipynb", ".py", ".csv", ".mtw", ".mtj"];
+const ACCEPTED_EXT    = [".pdf", ".xls", ".xlsx", ".R", ".r", ".rmd", ".Rmd", ".ipynb", ".py", ".csv", ".mtw", ".mtj", ".txt"];
 const MAX_FILE_SIZE_MB = 50;
+const MAX_TOTAL_MB     = 200;
 
 const STAGE_INFO = {
   1: {
-    label: "Stage 1 — EDA & Insight Report",
+    label: "Stage 1 — Data Analysis & Report",
+    deadline: "24th April 2026 before 12:00 noon",
     instructions: [
-      "Upload your EDA report as a PDF.",
-      "Include your R Markdown (.rmd) or Jupyter Notebook (.ipynb) file.",
-      "Include any supporting data files.",
-      "Do NOT include personal information or university name in the files.",
+      "Upload your analysis report as a PDF.",
+      "Include your R Markdown (.rmd), R Script (.R), or Jupyter Notebook (.ipynb).",
+      "Include any supporting data or CSV files.",
+      "Do NOT include your university name or personal info in the files.",
       "Only include your Team Name and Registration Number.",
+      "All files will be zipped automatically before upload.",
     ],
   },
   3: {
-    label: "Stage 3 — Model Building & Dashboard",
+    label: "Stage 3 — Dashboard Competition",
+    deadline: "10th May 2026",
     instructions: [
       "Upload your final full report as a PDF.",
+      "Include your dashboard file or a PDF export of the dashboard.",
       "Include your R Markdown / R Script or Jupyter Notebook.",
-      "Upload your dashboard file or a PDF export of the dashboard.",
-      "Do NOT include personal information or university name in the files.",
+      "Do NOT include your university name or personal info in the files.",
       "Only include your Team Name and Registration Number.",
+      "All files will be zipped automatically before upload.",
     ],
   },
 };
 
 export default function SubmissionPortal({ team, stage }) {
-  const [files,      setFiles]      = useState([]);   // { file, id, status, error }
+  const [files,      setFiles]      = useState([]);
   const [notes,      setNotes]      = useState("");
   const [submitted,  setSubmitted]  = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [progress,   setProgress]   = useState("");   // status message during upload
   const [dragOver,   setDragOver]   = useState(false);
+  const [uploadedMeta, setUploadedMeta] = useState(null); // saved submission record
 
-  const inputRef = useRef(null);
-
+  const inputRef  = useRef(null);
   const stageInfo = STAGE_INFO[stage] || STAGE_INFO[1];
+
+  // ── Eligibility check ─────────────────────────────────
+  const eligible = stage === 1 ? team.stage1_eligible : team.stage3_eligible;
 
   // ── File validation ────────────────────────────────────
   function validateFile(file) {
     const ext = "." + file.name.split(".").pop().toLowerCase();
-    if (!ACCEPTED_EXT.some(a => a.toLowerCase() === ext)) {
+    if (!ACCEPTED_EXT.some(a => a.toLowerCase() === ext))
       return `File type "${ext}" is not accepted.`;
-    }
-    if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-      return `File exceeds ${MAX_FILE_SIZE_MB}MB limit.`;
-    }
+    if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024)
+      return `File exceeds ${MAX_FILE_SIZE_MB} MB limit.`;
     return null;
   }
 
-  // ── Add files ──────────────────────────────────────────
   const addFiles = useCallback((incoming) => {
     const newEntries = Array.from(incoming).map(file => ({
       file,
       id:     crypto.randomUUID(),
-      status: "pending",   // pending | uploading | done | error
+      status: "pending",
       error:  validateFile(file),
     }));
     setFiles(prev => [...prev, ...newEntries]);
   }, []);
 
-  // ── Drag & drop handlers ───────────────────────────────
-  function onDrop(e) {
-    e.preventDefault();
-    setDragOver(false);
-    if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files);
-  }
-
-  function onDragOver(e) { e.preventDefault(); setDragOver(true);  }
-  function onDragLeave()  {                     setDragOver(false); }
-
   function removeFile(id) {
     setFiles(prev => prev.filter(f => f.id !== id));
   }
 
-  // ── Final submission ───────────────────────────────────
-  async function handleSubmit() {
-    const validFiles = files.filter(f => !f.error);
-    if (validFiles.length === 0) return;
+  // ── Total size check ───────────────────────────────────
+  const validFiles    = files.filter(f => !f.error);
+  const totalBytes    = validFiles.reduce((s, f) => s + f.file.size, 0);
+  const totalMB       = (totalBytes / (1024 * 1024)).toFixed(1);
+  const tooLarge      = totalBytes > MAX_TOTAL_MB * 1024 * 1024;
+  const hasValid      = validFiles.length > 0 && !tooLarge;
+  const hasInvalid    = files.some(f => f.error);
 
+  // ── Drag & drop ────────────────────────────────────────
+  function onDrop(e) {
+    e.preventDefault(); setDragOver(false);
+    if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files);
+  }
+  function onDragOver(e) { e.preventDefault(); setDragOver(true);  }
+  function onDragLeave()  { setDragOver(false); }
+
+  // ── Main submit ────────────────────────────────────────
+  async function handleSubmit() {
+    if (!hasValid || submitting) return;
     setSubmitting(true);
 
-    // Simulate upload progress per file
-    for (const entry of validFiles) {
-      setFiles(prev =>
-        prev.map(f => f.id === entry.id ? { ...f, status: "uploading" } : f)
-      );
-      await delay(600 + Math.random() * 400);
+    try {
+      // Step 1: zip all valid files
+      setProgress("Compressing files…");
+      const zip       = new JSZip();
+      const folder    = zip.folder(`${team.registration_number}_stage${stage}`);
 
-      // TODO: replace with Supabase Storage upload:
-      // const path = `stage${stage}/${team.registration_number}/${entry.file.name}`;
-      // const { error } = await supabase.storage
-      //   .from("submissions")
-      //   .upload(path, entry.file);
-      //
-      // Then insert into submissions table:
-      // await supabase.from("submissions").insert({
-      //   team_id:    team.id,
-      //   stage:      stage,
-      //   file_name:  entry.file.name,
-      //   file_path:  path,
-      //   notes:      notes,
-      // });
+      for (const entry of validFiles) {
+        folder.file(entry.file.name, entry.file);
+      }
 
-      setFiles(prev =>
-        prev.map(f => f.id === entry.id ? { ...f, status: "done" } : f)
+      const zipBlob = await zip.generateAsync(
+        { type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } },
+        ({ percent }) => setProgress(`Compressing… ${Math.round(percent)}%`)
       );
+
+      // Step 2: build a File object from the blob so uploadFile() works
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+      const zipName   = `${team.registration_number}_stage${stage}_${timestamp}.zip`;
+      const zipFile   = new File([zipBlob], zipName, { type: "application/zip" });
+
+      // Step 3: upload zip to Supabase Storage
+      setProgress("Uploading to server…");
+      const storagePath = await uploadFile(zipFile, stage, team.registration_number);
+
+      // Step 4: save metadata to submissions table
+      setProgress("Saving record…");
+      const record = await saveSubmission({
+        teamId:         team.id,
+        stage,
+        filePath:       storagePath,
+        fileName:       zipName,
+        fileSizeBytes:  zipFile.size,
+        fileType:       "zip",
+        notes:          notes.trim() || null,
+      });
+
+      setUploadedMeta(record);
+      setSubmitted(true);
+
+    } catch (err) {
+      setProgress("");
+      alert(`Upload failed: ${err.message}\n\nPlease try again or contact the organizers.`);
+    } finally {
+      setSubmitting(false);
     }
+  }
 
-    setSubmitting(false);
-    setSubmitted(true);
+  // ── Not eligible screen ────────────────────────────────
+  if (!eligible) {
+    return (
+      <div className="portal-wrap">
+        <div className="portal-card portal-card--success">
+          <div className="success-icon">🔒</div>
+          <h2 className="portal-title">Not Eligible for Stage {stage}</h2>
+          <p className="portal-sub">
+            Your team is not currently eligible to submit for Stage {stage}.
+            {stage === 3 && " Only Top 10 teams from Stage 1 can submit for Stage 3."}
+          </p>
+          <Link to="/" className="btn-outline-sub">← Back to Home</Link>
+        </div>
+      </div>
+    );
   }
 
   // ── Success screen ─────────────────────────────────────
@@ -142,16 +179,23 @@ export default function SubmissionPortal({ team, stage }) {
           <div className="success-icon">✅</div>
           <h2 className="portal-title">Submission Received!</h2>
           <p className="portal-sub">
-            Your files for <strong>{stageInfo.label}</strong> have been submitted successfully.
+            Your files for <strong>{stageInfo.label}</strong> have been
+            uploaded and saved successfully.
           </p>
           <div className="success-meta">
             <div><span>Team</span><strong>{team.team_name}</strong></div>
             <div><span>Reg. No.</span><strong>{team.registration_number}</strong></div>
             <div><span>Stage</span><strong>{stage}</strong></div>
-            <div><span>Files</span><strong>{files.filter(f => !f.error).length} file(s)</strong></div>
+            <div><span>Files zipped</span><strong>{validFiles.length} file(s)</strong></div>
+            {uploadedMeta && (
+              <div>
+                <span>Submitted at</span>
+                <strong>{new Date(uploadedMeta.submitted_at).toLocaleString("en-GB")}</strong>
+              </div>
+            )}
           </div>
           <p className="portal-note">
-            Keep this confirmation. If you need to re-submit, contact the organizers.
+            Screenshot this page for your records. Contact organizers if you need to resubmit.
           </p>
           <Link to="/" className="btn-outline-sub">← Back to Home</Link>
         </div>
@@ -159,9 +203,7 @@ export default function SubmissionPortal({ team, stage }) {
     );
   }
 
-  const hasValid   = files.some(f => !f.error);
-  const hasInvalid = files.some(f =>  f.error);
-
+  // ── Upload form ────────────────────────────────────────
   return (
     <div className="portal-wrap">
       <div className="portal-card">
@@ -174,6 +216,9 @@ export default function SubmissionPortal({ team, stage }) {
             <span>👥 {team.team_name}</span>
             <span className="sep">·</span>
             <span className="reg">{team.registration_number}</span>
+          </div>
+          <div className="portal-deadline">
+            ⏰ Deadline: <strong>{stageInfo.deadline}</strong>
           </div>
         </div>
 
@@ -193,10 +238,10 @@ export default function SubmissionPortal({ team, stage }) {
           onDrop={onDrop}
           onDragOver={onDragOver}
           onDragLeave={onDragLeave}
-          onClick={() => inputRef.current?.click()}
+          onClick={() => !submitting && inputRef.current?.click()}
           role="button"
           tabIndex={0}
-          onKeyDown={e => e.key === "Enter" && inputRef.current?.click()}
+          onKeyDown={e => e.key === "Enter" && !submitting && inputRef.current?.click()}
         >
           <input
             ref={inputRef}
@@ -205,42 +250,55 @@ export default function SubmissionPortal({ team, stage }) {
             style={{ display: "none" }}
             accept={ACCEPTED_EXT.join(",")}
             onChange={e => addFiles(e.target.files)}
+            disabled={submitting}
           />
           <div className="drop-zone__icon">📂</div>
           <p className="drop-zone__main">
             {dragOver ? "Drop files here" : "Drag & drop files, or click to browse"}
           </p>
           <p className="drop-zone__sub">
-            Accepted: {ACCEPTED_EXT.join(", ")} · Max {MAX_FILE_SIZE_MB}MB per file
+            Accepted: {ACCEPTED_EXT.join(", ")} · Max {MAX_FILE_SIZE_MB} MB per file
+          </p>
+          <p className="drop-zone__sub">
+            Files will be zipped automatically before upload.
           </p>
         </div>
 
         {/* File list */}
         {files.length > 0 && (
-          <ul className="file-list">
-            {files.map(entry => (
-              <li key={entry.id} className={`file-item file-item--${entry.error ? "error" : entry.status}`}>
-                <span className="file-icon">{fileIcon(entry.file.name)}</span>
-                <div className="file-info">
-                  <span className="file-name">{entry.file.name}</span>
-                  <span className="file-size">{formatSize(entry.file.size)}</span>
-                  {entry.error && <span className="file-error">{entry.error}</span>}
-                </div>
-                <span className="file-status">
-                  {entry.status === "uploading" && <span className="spinner-dot" />}
-                  {entry.status === "done"      && "✓"}
-                  {entry.error                  && "✕"}
-                </span>
-                {entry.status === "pending" && (
-                  <button
-                    className="file-remove"
-                    onClick={() => removeFile(entry.id)}
-                    title="Remove"
-                  >×</button>
-                )}
-              </li>
-            ))}
-          </ul>
+          <>
+            <ul className="file-list">
+              {files.map(entry => (
+                <li
+                  key={entry.id}
+                  className={`file-item file-item--${entry.error ? "error" : entry.status}`}
+                >
+                  <span className="file-icon">{fileIcon(entry.file.name)}</span>
+                  <div className="file-info">
+                    <span className="file-name">{entry.file.name}</span>
+                    <span className="file-size">{formatSize(entry.file.size)}</span>
+                    {entry.error && <span className="file-error">{entry.error}</span>}
+                  </div>
+                  <span className="file-status">
+                    {entry.error && "✕"}
+                  </span>
+                  {!submitting && (
+                    <button
+                      className="file-remove"
+                      onClick={() => removeFile(entry.id)}
+                      title="Remove"
+                    >×</button>
+                  )}
+                </li>
+              ))}
+            </ul>
+
+            {/* Total size indicator */}
+            <div className={`portal-size-bar ${tooLarge ? "portal-size-bar--over" : ""}`}>
+              <span>Total size: <strong>{totalMB} MB</strong> / {MAX_TOTAL_MB} MB</span>
+              {tooLarge && <span className="size-warn">⚠ Total exceeds {MAX_TOTAL_MB} MB limit</span>}
+            </div>
+          </>
         )}
 
         {/* Notes */}
@@ -258,40 +316,47 @@ export default function SubmissionPortal({ team, stage }) {
           />
         </div>
 
-        {/* Warnings */}
         {hasInvalid && (
           <div className="portal-warning">
-            ⚠ Some files have errors and will be skipped. Fix or remove them before submitting.
+            ⚠ Files with errors will be skipped. Remove or fix them before submitting.
           </div>
         )}
 
-        {/* Submit button */}
+        {/* Progress message */}
+        {submitting && progress && (
+          <div className="portal-progress">
+            <span className="spinner-dot" />
+            <span>{progress}</span>
+          </div>
+        )}
+
+        {/* Submit */}
         <button
           className="portal-submit"
           disabled={!hasValid || submitting}
           onClick={handleSubmit}
         >
-          {submitting ? "Uploading…" : `Submit ${hasValid ? files.filter(f => !f.error).length : ""} File(s) →`}
+          {submitting
+            ? "Processing…"
+            : `Zip & Submit ${validFiles.length} File(s) →`}
         </button>
 
         <Link to="/" className="auth-back">← Back to Home</Link>
-
       </div>
     </div>
   );
 }
 
-/* ── Tiny helpers ─────────────────────────────────────────── */
 function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 function formatSize(bytes) {
-  if (bytes < 1024)        return bytes + " B";
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+  if (bytes < 1024)         return bytes + " B";
+  if (bytes < 1024 * 1024)  return (bytes / 1024).toFixed(1) + " KB";
   return (bytes / (1024 * 1024)).toFixed(1) + " MB";
 }
 
 function fileIcon(name) {
   const ext = name.split(".").pop().toLowerCase();
-  const map = { pdf: "📄", xlsx: "📊", xls: "📊", r: "📈", rmd: "📈", ipynb: "🐍", py: "🐍", csv: "📋", mtw: "📉", mtj: "📉" };
+  const map  = { pdf:"📄", xlsx:"📊", xls:"📊", r:"📈", rmd:"📈", ipynb:"🐍", py:"🐍", csv:"📋", mtw:"📉", mtj:"📉" };
   return map[ext] || "📁";
 }
