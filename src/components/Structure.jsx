@@ -78,7 +78,7 @@ function Structure() {
                 Demonstrate methodology, design choices, and <strong>data storytelling</strong>.
               </li>
               <li>
-                Winners recognized at <strong>Stat Day & Award Ceremony</strong>{" "}4th June 2026.
+                Winners recognized at <strong>Stat Day & Award Ceremony 4th June 2026</strong>.
               </li>
               <li>
                 Prizes<br/> 
