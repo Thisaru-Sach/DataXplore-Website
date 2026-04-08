@@ -102,6 +102,52 @@
   text-transform: uppercase;
 }
 
+/* Past events — dimmed dot + faded card */
+.tl-node-v--past .tl-dot-v {
+  border-color: var(--muted);
+  box-shadow: none;
+  background: var(--muted);
+  opacity: 0.55;
+}
+.tl-node-v--past .tl-card-v {
+  opacity: 0.55;
+}
+ 
+/* Today — orange highlight */
+.tl-node-v--today .tl-dot-v {
+  border-color: var(--orange);
+  box-shadow: 0 0 14px rgba(245, 162, 0, 0.7);
+  background: var(--orange);
+}
+.tl-node-v--today .tl-card-v {
+  border-color: var(--orange);
+  box-shadow: 0 0 18px rgba(245, 162, 0, 0.25);
+}
+ 
+/* Future events — default cyan (no change needed, already styled) */
+ 
+/* ── Badges inside cards ── */
+.tl-badge {
+  display: inline-block;
+  margin-top: 5px;
+  font-family: var(--ff-mono);
+  font-size: 0.58rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 2px;
+}
+.tl-badge--past {
+  background: rgba(95, 154, 184, 0.15);
+  color: var(--muted);
+  border: 1px solid rgba(95, 154, 184, 0.25);
+}
+.tl-badge--today {
+  background: rgba(245, 162, 0, 0.15);
+  color: var(--orange);
+  border: 1px solid rgba(245, 162, 0, 0.35);
+}
+
 /* --- RESPONSIVE DESIGN --- */
 
 @media (max-width: 768px) {

@@ -52,11 +52,11 @@ function Hero() {
 
         <div className="hero-stats">
           <div className="hs-item">
-            <span className="val">28 Mar</span>
+             <span className="val">{fmt(DATES.registrationOpen,  "short")}</span>
             <span className="lbl">Reg Opens</span>
           </div>
           <div className="hs-item">
-            <span className="val">8 Apr</span>
+             <span className="val">{fmt(DATES.registrationClose, "short")}</span>
             <span className="lbl">Reg Closes</span>
           </div>
           <div className="hs-item">
