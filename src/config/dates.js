@@ -15,7 +15,7 @@ export const DATES = {
   registrationOpen:  new Date("2026-03-28T00:00:00"),
   registrationClose: new Date("2026-04-08T11:59:59"),
 
-  stage1Open:        new Date("2026-04-08T00:00:00"),
+  stage1Open:        new Date("2026-04-16T00:00:00"),
   stage1Close:       new Date("2026-04-24T12:00:00"),  // noon deadline
 
   workshopDate:      new Date("2026-05-03T13:00:00"),  // 1 pm start
