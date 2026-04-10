@@ -1,7 +1,7 @@
 // src/pages/admin/TeamDetail.jsx
 import { useEffect, useState }     from "react";
 import { useParams, Link }         from "react-router-dom";
-import { adminSupabase, getDownloadUrl, setEligibility } from "../../lib/adminSupabase";
+import { adminSupabase, getDownloadUrl, setEligibility } from "../../lib/adminsupabase";
 import "./Admin.css";
 
 export default function TeamDetail() {

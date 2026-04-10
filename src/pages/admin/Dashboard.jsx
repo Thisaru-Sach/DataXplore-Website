@@ -1,7 +1,7 @@
 // src/pages/admin/Dashboard.jsx
 import { useEffect, useState } from "react";
 import { Link }                from "react-router-dom";
-import { getAllTeams, setEligibility } from "../../lib/adminSupabase";
+import { getAllTeams, setEligibility } from "../../lib/adminsupabase";
 import "./Admin.css";
 
 export default function Dashboard() {

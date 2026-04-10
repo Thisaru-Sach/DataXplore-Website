@@ -1,6 +1,6 @@
 // src/pages/admin/Submissions.jsx
 import { useEffect, useState } from "react";
-import { getAllSubmissions, getDownloadUrl, deleteSubmission } from "../../lib/adminSupabase.js";
+import { getAllSubmissions, getDownloadUrl, deleteSubmission } from "../../lib/adminsupabase.js";
 import "./Admin.css";
 
 export default function Submissions() {
