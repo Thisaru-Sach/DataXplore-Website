@@ -1,72 +1,76 @@
 // supabase/functions/team-auth/index.ts
-// ─────────────────────────────────────────────────────────
-//  Supabase Edge Function — Team Authentication
-//
-//  Called by AuthGate.jsx with { registration_number, email }
-//  Returns a signed JWT containing team_id so RLS policies work.
-//
-//  Deploy:
-//    supabase functions deploy team-auth
-//
-//  This runs on Supabase's servers — the SERVICE ROLE KEY
-//  is safe here and never exposed to the browser.
-// ─────────────────────────────────────────────────────────
-import { serve }         from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient }  from "https://esm.sh/@supabase/supabase-js@2";
 
-const SUPABASE_URL      = Deno.env.get("SUPABASE_URL")!;
-const SUPABASE_SERVICE  = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+import { serve }        from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
+const SUPABASE_URL     = Deno.env.get("SUPABASE_URL")!;
+const SUPABASE_SERVICE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+// ── CORS headers ───────────────────────────────────────────
+const cors = {
   "Access-Control-Allow-Origin":  "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+function json(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...cors, "Content-Type": "application/json" },
+  });
+}
+
 serve(async (req) => {
-  // Handle CORS preflight
+
+  // ── CORS preflight — MUST return 200 with null body ──────
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response(null, { status: 200, headers: cors });
+  }
+
+  // ── Only allow POST ──────────────────────────────────────
+  if (req.method !== "POST") {
+    return json({ error: "Method not allowed" }, 405);
   }
 
   try {
-    const { registration_number, email } = await req.json();
-
-    if (!registration_number || !email) {
-      return new Response(
-        JSON.stringify({ error: "registration_number and email are required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    // ── Parse body ───────────────────────────────────────
+    let body: { registration_number?: string; email?: string };
+    try {
+      body = await req.json();
+    } catch {
+      return json({ error: "Invalid JSON body" }, 400);
     }
 
-    // Use service role client — bypasses RLS for this lookup
+    const { registration_number, email } = body;
+
+    if (!registration_number?.trim() || !email?.trim()) {
+      return json({ error: "registration_number and email are required" }, 400);
+    }
+
+    // ── DB lookup with service role (bypasses RLS) ───────
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE);
 
-    // Look up team
-    const { data: team, error } = await supabase
+    const { data: team, error: dbError } = await supabase
       .from("teams")
-      .select("id, team_name, university, email, member_count, registration_number, stage1_eligible, stage3_eligible")
+      .select(
+        "id, team_name, university, email, phone, member_count, " +
+        "registration_number, stage1_eligible, stage3_eligible, created_at"
+      )
       .eq("registration_number", registration_number.trim().toUpperCase())
       .eq("email", email.trim().toLowerCase())
       .single();
 
-    if (error || !team) {
-      return new Response(
-        JSON.stringify({ error: "Team not found. Check your registration number and email." }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    if (dbError || !team) {
+      return json(
+        { error: "Team not found. Check your registration number and email." },
+        401
       );
     }
 
-    // Return team data — client will store this in state
-    // The team_id is embedded so the frontend can pass it with requests
-    return new Response(
-      JSON.stringify({ team }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return json({ team });
 
   } catch (err) {
-    return new Response(
-      JSON.stringify({ error: "Internal server error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    console.error("team-auth error:", err);
+    return json({ error: "Internal server error" }, 500);
   }
 });
