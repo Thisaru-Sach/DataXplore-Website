@@ -15,7 +15,7 @@ const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
  * Returns the team object on success.
  * Throws an Error with a user-friendly message on failure.
  */
-export async function verifyTeam(registrationNumber, email) {
+export async function verifyTeam(nic, email) {
   const res = await fetch(
     `${EDGE_URL}/functions/v1/team-auth`,
     {
@@ -26,7 +26,7 @@ export async function verifyTeam(registrationNumber, email) {
         "Authorization": `Bearer ${ANON_KEY}`,
       },
       body: JSON.stringify({
-        registration_number: registrationNumber.trim().toUpperCase(),
+        nic_number: nic.trim().toUpperCase(),
         email:               email.trim().toLowerCase(),
       }),
     }

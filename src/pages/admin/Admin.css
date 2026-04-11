@@ -392,3 +392,278 @@
   .adm-sidebar-footer { flex-direction: row; border: none; padding: 0; margin-left: auto; }
   .adm-main { padding: 20px 16px; }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   APPEND THESE TO THE BOTTOM OF src/pages/admin/Admin.css
+   These cover: modal, team form, member cards, section layout
+═══════════════════════════════════════════════════════════ */
+
+/* ── Add Team button ─────────────────────────────────────── */
+.adm-add-btn {
+  background: linear-gradient(135deg, #58a6ff, #3a86e0);
+  color: #000;
+  border: none;
+  padding: 7px 18px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s, box-shadow 0.2s;
+  white-space: nowrap;
+}
+.adm-add-btn:hover { opacity: 0.88; box-shadow: 0 0 14px rgba(88,166,255,0.45); }
+
+/* ── Modal overlay ───────────────────────────────────────── */
+.adm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 20px;
+  overflow-y: auto;
+}
+
+.adm-modal {
+  background: #161b22;
+  border: 1px solid #30363d;
+  width: 100%;
+  max-width: 780px;
+  display: flex;
+  flex-direction: column;
+}
+
+.adm-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 28px;
+  border-bottom: 1px solid #30363d;
+}
+.adm-modal-header h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #c9d1d9;
+}
+.adm-modal-close {
+  background: none;
+  border: none;
+  color: #8b949e;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.2s;
+}
+.adm-modal-close:hover { color: #f78166; }
+
+/* ── Team form inside modal ──────────────────────────────── */
+.adm-team-form {
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-height: 75vh;
+  overflow-y: auto;
+}
+
+.adm-form-section {
+  margin-bottom: 24px;
+}
+
+.adm-form-section-title {
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #58a6ff;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #30363d;
+}
+
+.adm-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+.adm-form-row > label:only-child {
+  grid-column: 1 / -1;
+}
+
+.adm-form-row label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 0.72rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #8b949e;
+}
+
+.adm-form-row input,
+.adm-form-row select {
+  background: #0d1117;
+  border: 1px solid #30363d;
+  color: #c9d1d9;
+  padding: 8px 11px;
+  font-size: 0.88rem;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+.adm-form-row input:focus,
+.adm-form-row select:focus { border-color: #58a6ff; }
+.adm-form-row input::placeholder { color: #484f58; }
+
+/* Required asterisk */
+.req { color: #f78166; }
+
+/* Checkbox row */
+.adm-form-checkrow {
+  grid-template-columns: auto auto;
+  justify-content: start;
+  gap: 28px;
+}
+.adm-check-label {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: #c9d1d9 !important;
+  cursor: pointer;
+}
+.adm-check-label input[type="checkbox"] {
+  width: 16px; height: 16px;
+  accent-color: #58a6ff;
+  cursor: pointer;
+}
+
+/* Form action buttons */
+.adm-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #30363d;
+  margin-top: 8px;
+}
+.adm-form-cancel {
+  background: none;
+  border: 1px solid #30363d;
+  color: #8b949e;
+  padding: 9px 20px;
+  font-size: 0.83rem;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+.adm-form-cancel:hover { border-color: #58a6ff; color: #58a6ff; }
+.adm-form-save {
+  background: #58a6ff;
+  color: #000;
+  border: none;
+  padding: 9px 24px;
+  font-size: 0.83rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.adm-form-save:hover:not(:disabled) { opacity: 0.88; }
+.adm-form-save:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Detail page additions ───────────────────────────────── */
+.adm-detail-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: #8b949e;
+}
+.adm-dot { opacity: 0.4; }
+.adm-detail-university { color: #58a6ff; }
+
+.adm-detail-section {
+  margin-bottom: 36px;
+}
+.adm-section-title {
+  font-size: 0.7rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #58a6ff;
+  margin-bottom: 14px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #30363d;
+}
+
+.adm-detail-card--full {
+  grid-column: 1 / -1;
+}
+
+.adm-link-inline {
+  color: #58a6ff;
+  text-decoration: none;
+}
+.adm-link-inline:hover { text-decoration: underline; }
+
+.adm-id-link {
+  display: inline-block;
+  color: #58a6ff;
+  text-decoration: none;
+  font-size: 0.88rem;
+  border: 1px solid rgba(88,166,255,0.3);
+  padding: 6px 14px;
+  transition: background 0.2s;
+}
+.adm-id-link:hover { background: rgba(88,166,255,0.1); }
+
+/* ── Members grid ────────────────────────────────────────── */
+.adm-members-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+.adm-member-card {
+  background: #0d1117;
+  border: 1px solid #30363d;
+  padding: 14px 16px;
+  border-left: 3px solid #58a6ff;
+}
+.adm-member-num {
+  font-size: 0.6rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #58a6ff;
+  margin-bottom: 5px;
+}
+.adm-member-name {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #c9d1d9;
+  margin-bottom: 3px;
+}
+.adm-member-contact {
+  font-size: 0.78rem;
+  color: #8b949e;
+  font-family: 'Courier New', monospace;
+}
+
+/* ── Preferred name in table ─────────────────────────────── */
+.adm-preferred {
+  color: #8b949e;
+  font-size: 0.78rem;
+  font-weight: 400;
+}
+
+/* ── Responsive modal ────────────────────────────────────── */
+@media (max-width: 600px) {
+  .adm-form-row { grid-template-columns: 1fr; }
+  .adm-modal-overlay { padding: 0; }
+  .adm-modal { max-height: 100vh; }
+  .adm-team-form { max-height: 80vh; }
+}

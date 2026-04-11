@@ -6,7 +6,7 @@ import { verifyTeam }        from "../../lib/teamAuth";
 import "./Authgate.css";
 
 export default function AuthGate({ onAuthenticated, stage }) {
-  const [regNumber, setRegNumber] = useState("");
+  const [nic, setNic] = useState("");
   const [email,     setEmail]     = useState("");
   const [loading,   setLoading]   = useState(false);
   const [error,     setError]     = useState("");
@@ -14,13 +14,13 @@ export default function AuthGate({ onAuthenticated, stage }) {
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
-    if (!regNumber.trim() || !email.trim()) {
+    if (!nic.trim() || !email.trim()) {
       setError("Please fill in both fields.");
       return;
     }
     setLoading(true);
     try {
-      const team = await verifyTeam(regNumber, email);
+      const team = await verifyTeam(nic, email);
       onAuthenticated(team);
     } catch (err) {
       setError(err.message || "Verification failed. Please check your details.");
@@ -32,7 +32,7 @@ export default function AuthGate({ onAuthenticated, stage }) {
   function skipLogin() {
     onAuthenticated({
       id: "test-bypass", team_name: "Test Team Alpha",
-      registration_number: "DX2026-TEST", email: "test@example.com",
+      nic: "DX2026-TEST", email: "test@example.com",
       university: "Test University", member_count: 3,
       stage1_eligible: true, stage3_eligible: false,
     });
@@ -51,10 +51,10 @@ export default function AuthGate({ onAuthenticated, stage }) {
 
         <form onSubmit={handleSubmit} className="auth-form" noValidate>
           <div className="auth-field">
-            <label htmlFor="reg-number">Registration Number</label>
+            <label htmlFor="reg-number">Team Leader"s NIC Number</label>
             <input
-              id="reg-number" type="text" placeholder="e.g. DX2026-001"
-              value={regNumber} onChange={e => setRegNumber(e.target.value)}
+              id="reg-number" type="text" placeholder="e.g. 200XXXXXXXXX"
+              value={nic} onChange={e => setNic(e.target.value)}
               autoComplete="off" spellCheck={false} disabled={loading}
             />
           </div>
