@@ -10,7 +10,7 @@ function Timeline() {
     { date: DATES.registrationOpen,  evt: "Registration Opens" },
     { date: DATES.registrationClose, evt: "Registration Closes" },
     { date: DATES.stage1Close,       evt: "Report Submission Deadline" },
-    { date: DATES.workshopDate,      evt: "Dashboard Workshop + E-Cert" },
+    { date: DATES.workshopDate,      evt: "Dashboard Workshop" },
     { date: DATES.top10Announce,     evt: "Top 10 Announcement" },
     { date: DATES.stage3Close,       evt: "Dashboard Competition" },
     { date: DATES.top5Announce,      evt: "Top 5 Announcement" },
