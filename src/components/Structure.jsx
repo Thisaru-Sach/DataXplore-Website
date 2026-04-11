@@ -98,10 +98,7 @@ function Structure() {
                 <strong>{fmt(DATES.stage3Close, "long")}</strong>; Top 5 teams reach the finals.
               </li>
               <li>
-                Fianl presenations on <strong>17th May 2026</strong>.
-              </li>
-              <li>
-                Fianl presenations on <strong>17th May 2026</strong>.
+                Final presenations on <strong>17th May 2026</strong>.
               </li>
             </ul>
           </div>
