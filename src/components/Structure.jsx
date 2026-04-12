@@ -4,10 +4,10 @@ import { DATES, fmt, getPhase } from "../config/dates";
 
 const RESOURCE_PERSONS = [
   {
-    name: "Dr. Thiyanga Thalagala",
+    name: "Dr. Thiyanga Talagala",
     title: "Senior Lecturer",
-    org: "USJP",
-    bio: "Research experience in AI, data analysis.",
+    org: "Department of Statistics, University Sri Jayawardenepura",
+    bio: "",
     avatar: "", // leave empty for initials fallback
   },
 ];
