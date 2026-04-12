@@ -9,7 +9,7 @@
 //  Set to false before going live.
 // ─────────────────────────────────────────────────────────
 
-export const BYPASS_DATE_CHECK = false; //  flip to false for production
+export const BYPASS_DATE_CHECK = true; //  flip to false for production
 
 export const DATES = {
   registrationOpen:  new Date("2026-03-28T00:00:00"),
@@ -18,7 +18,8 @@ export const DATES = {
   stage1Open:        new Date("2026-04-08T00:00:00"),
   stage1Close:       new Date("2026-04-24T23:59:00"),  // noon deadline
 
-  workshopDate:      new Date("2026-04-25T13:00:00"),  // 1 pm start
+  helpDeskSession:   new Date("2026-04-23T15:00:00"),  // 4th Apr, 3:00 pm
+  workshopDate:      new Date("2026-04-25T08:00:00"),  // 8am start
   top10Announce:     new Date("2026-05-04T00:00:00"),
 
   stage3Open:        new Date("2026-05-04T00:00:00"),
@@ -37,6 +38,7 @@ export const DATES = {
 //  style "short" → "28 Mar"          (used in Hero stats bar)
 //  style "full"  → "28 Mar 2026"     (used in Timeline)
 //  style "long"  → "28th March 2026" (used in Guidelines/Structure)
+//  style "time"  → "3:00 pm"         (used for session times)
 // ─────────────────────────────────────────────────────────
 export function fmt(date, style = "full") {
   if (!(date instanceof Date) || isNaN(date)) return "TBA";
@@ -59,6 +61,13 @@ export function fmt(date, style = "full") {
     return `${day}${ordinal(day)} ${month} ${year}`;
   }
 
+  if (style === "time") {
+    // e.g. "3:00 pm"
+    return date.toLocaleTimeString("en-GB", {
+      hour: "numeric", minute: "2-digit", hour12: true,
+    });
+  }
+  
   return date.toDateString();
 }
 

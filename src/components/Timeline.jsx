@@ -9,6 +9,7 @@ function Timeline() {
   const events = [
     { date: DATES.registrationOpen,  evt: "Registration Opens" },
     { date: DATES.registrationClose, evt: "Registration Closes" },
+    { date: DATES.helpDeskSession, evt: "Help Desk Session" },
     { date: DATES.stage1Close,       evt: "Report Submission Deadline" },
     { date: DATES.workshopDate,      evt: "Dashboard Workshop" },
     { date: DATES.top10Announce,     evt: "Top 10 Announcement" },

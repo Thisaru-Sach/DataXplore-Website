@@ -208,3 +208,79 @@
     padding: 36px 20px;
   }
 }
+
+/* ── Append these to your existing Authgate.css ─────────── */
+
+/* Dataset resource box — sits between header and form */
+.auth-dataset-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(0, 200, 240, 0.05);
+  border: 1px solid rgba(0, 200, 240, 0.22);
+  padding: 14px 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.auth-dataset-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.auth-dataset-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.auth-dataset-label {
+  display: block;
+  font-family: var(--ff-mono);
+  font-size: 0.6rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 3px;
+}
+
+.auth-dataset-desc {
+  color: var(--muted);
+  font-size: 0.83rem;
+  line-height: 1.4;
+}
+
+.auth-dataset-btn {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  background: linear-gradient(135deg, var(--cyan), var(--cyan-dim));
+  color: #000;
+  font-family: var(--ff-head);
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 8px 18px;
+  clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.auth-dataset-btn:hover {
+  box-shadow: var(--glow-c);
+  transform: translateY(-1px);
+}
+
+/* On small screens, stack the button below */
+@media (max-width: 480px) {
+  .auth-dataset-box {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .auth-dataset-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
