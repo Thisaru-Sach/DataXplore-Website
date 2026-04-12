@@ -95,7 +95,7 @@ function Structure() {
               <li>
                 Deadline:{" "}
                 <strong>
-                  {fmt(DATES.stage1Close, "long")} before 12:00 noon
+                  {fmt(DATES.stage1Close, "long")} before <strong>{fmt(DATES.stage1Close, "time")}</strong>
                 </strong>
                 .
               </li>
@@ -118,7 +118,7 @@ function Structure() {
               <li>Delivered by industry and academic experts.</li>
               <li>Focuses on professional dashboard creation and standards.</li>
               <li>
-                Held on <strong>{fmt(DATES.workshopDate, "long")}</strong>
+                Held on <strong>{fmt(DATES.workshopDate, "long")}</strong>{", "}<strong>{fmt(DATES.workshopDate, "time")} to 10:00 am</strong>. 
               </li>
             </ul>
 
