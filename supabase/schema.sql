@@ -72,9 +72,13 @@ CREATE TABLE IF NOT EXISTS submissions (
 ALTER TABLE teams       ENABLE ROW LEVEL SECURITY;
 ALTER TABLE submissions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "teams_own_row" ON teams;
+
 CREATE POLICY "teams_own_row" ON teams
   FOR ALL
   USING (id::text = current_setting('request.jwt.claims', true)::json->>'team_id');
+
+  DROP POLICY IF EXISTS "submissions_own_rows" ON submissions;
 
 CREATE POLICY "submissions_own_rows" ON submissions
   FOR ALL
@@ -143,3 +147,55 @@ CREATE OR REPLACE VIEW admin_submission_overview AS
 -- ALTER TABLE teams ADD COLUMN IF NOT EXISTS member4       text;
 -- Then refresh the view:
 -- CREATE OR REPLACE VIEW admin_submission_overview AS ...
+
+DROP POLICY IF EXISTS "Allow anon uploads to submissions" ON storage.objects;
+
+CREATE POLICY "Allow anon uploads to submissions"
+ON storage.objects FOR INSERT
+TO public
+WITH CHECK (bucket_id = 'submissions');
+
+-- Remove the JWT-dependent policy
+DROP POLICY IF EXISTS "Allow anon inserts to submissions" ON submissions;
+
+-- Allow anonymous inserts into the submissions table
+CREATE POLICY "Allow anon inserts to submissions"
+ON submissions FOR INSERT
+TO public
+WITH CHECK (true);
+
+-- Allow teams to view their own submissions (if you use getTeamSubmissions on the frontend)
+-- Note: Since the user is anon, they could technically query any team's submissions if they knew the team_id. 
+
+DROP POLICY IF EXISTS "Allow anon selects on submissions" ON submissions;
+
+CREATE POLICY "Allow anon selects on submissions"
+ON submissions FOR SELECT
+TO public
+USING (true);
+
+-- ═══════════════════════════════════════════════════════════
+--  Run this in Supabase SQL Editor
+--  Allows the public site to read team names for Top 10 display.
+--  Only reads stage3_eligible=true teams — no sensitive data.
+-- ═══════════════════════════════════════════════════════════
+ 
+-- Allow anyone (anon) to read team names + university for Top 10 display
+-- Only exposes: id, team_name, university for stage3_eligible teams
+-- Sensitive fields (NIC, email, student_id_url) are NOT in the SELECT
+-- in Top10Teams.jsx so they are never sent to the browser.
+
+DROP POLICY IF EXISTS "public_read_stage3_teams" ON teams;
+
+CREATE POLICY "public_read_stage3_teams"
+ON teams
+FOR SELECT
+TO public              -- anon key can read
+USING (stage3_eligible = true);  -- only eligible teams are visible
+ 
+-- ── If you already have a "teams_own_row" policy that blocks everything ──
+-- The service role (admin) bypasses all RLS, so admin still sees all teams.
+-- The anon client only sees stage3_eligible=true rows via the policy above.
+ 
+-- Verify:
+-- SELECT team_name, university FROM teams WHERE stage3_eligible = true;

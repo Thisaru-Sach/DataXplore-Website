@@ -1,0 +1,145 @@
+/* src/components/Top10Teams.css */
+
+/* Intro paragraph */
+.top10-intro {
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.65;
+  max-width: 620px;
+  margin-bottom: 40px;
+  margin-top: -24px;
+}
+
+/* Loading state */
+.top10-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  font-family: var(--ff-mono);
+  font-size: 0.78rem;
+  letter-spacing: 2px;
+}
+.top10-spinner {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--cyan);
+  border-top-color: transparent;
+  animation: top10spin 0.7s linear infinite;
+}
+@keyframes top10spin { to { transform: rotate(360deg); } }
+
+/* Empty state */
+.top10-empty {
+  color: var(--muted);
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+/* Grid of team cards */
+.top10-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+/* Individual team card */
+.top10-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(2, 20, 40, 0.75);
+  border: 1px solid var(--border);
+  padding: 18px 20px;
+  position: relative;
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.2s;
+  /* angular clip same as the site's button style */
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+}
+
+.top10-card:hover {
+  border-color: var(--cyan);
+  box-shadow: var(--glow-c);
+  transform: translateY(-2px);
+}
+
+/* Rank number */
+.top10-rank {
+  font-family: var(--ff-mono);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--orange);
+  flex-shrink: 0;
+  line-height: 1;
+  min-width: 32px;
+}
+
+/* Team name + university */
+.top10-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.top10-name {
+  font-family: var(--ff-head);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.top10-uni {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-family: var(--ff-body);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Advanced badge */
+.top10-badge {
+  font-family: var(--ff-mono);
+  font-size: 0.58rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #40d080;
+  background: rgba(63, 185, 80, 0.1);
+  border: 1px solid rgba(63, 185, 80, 0.28);
+  padding: 3px 8px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Bypass mode note */
+.top10-bypass-note {
+  margin-top: 24px;
+  font-family: var(--ff-mono);
+  font-size: 0.65rem;
+  color: #f0c040;
+  letter-spacing: 1px;
+  opacity: 0.75;
+}
+
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .top10-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .top10-card {
+    clip-path: none;  /* clip-path looks odd on very narrow cards */
+    border-left: 3px solid var(--orange);
+  }
+
+  .top10-badge {
+    display: none;   /* hide on very small screens to save space */
+  }
+}

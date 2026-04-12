@@ -5,6 +5,8 @@ import { BYPASS_DATE_CHECK } from "../../config/dates";
 import { verifyTeam }        from "../../lib/teamAuth";
 import "./Authgate.css";
 
+const DATASET_DRIVE_URL = "https://drive.google.com/drive/folders/YOUR_FOLDER_ID";
+
 export default function AuthGate({ onAuthenticated, stage }) {
   const [nic, setNic] = useState("");
   const [email,     setEmail]     = useState("");
@@ -47,6 +49,25 @@ export default function AuthGate({ onAuthenticated, stage }) {
           <p className="auth-subtitle">
             Enter your registration details to access the submission portal.
           </p>
+        </div>
+
+        {/* ── Dataset resource link ── */}
+        <div className="auth-dataset-box">
+          <div className="auth-dataset-icon">📁</div>
+          <div className="auth-dataset-text">
+            <span className="auth-dataset-label">Competition Dataset</span>
+            <p className="auth-dataset-desc">
+              Download the official dataset for Stage {stage} from Google Drive.
+            </p>
+          </div>
+          <a
+            href={DATASET_DRIVE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="auth-dataset-btn"
+          >
+            Open Drive →
+          </a>
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form" noValidate>

@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar.jsx";
 import Hero from "../components/Hero.jsx";
 import About from "../components/About.jsx";
 import Timeline from "../components/Timeline.jsx";
+import Top10Teams       from "../components/Top10Teams"; 
 import Structure from "../components/Structure.jsx";
 import Guidelines from "../components/Guidelines.jsx";
 import RegCTA from "../components/RegCTA.jsx";
@@ -61,6 +62,7 @@ function Home() {
     <Hero/>
     <About/>
     <Timeline/>
+     <Top10Teams />
     <Structure/>
     <Guidelines/>
     <RegCTA/>
