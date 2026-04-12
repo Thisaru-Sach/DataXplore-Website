@@ -57,7 +57,7 @@ export default function AuthGate({ onAuthenticated, stage }) {
           <div className="auth-dataset-text">
             <span className="auth-dataset-label">Competition Dataset</span>
             <p className="auth-dataset-desc">
-              Download the official dataset for Stage {stage} from Google Drive.
+              Download the official dataset and guidelines for Stage {stage} from Google Drive.
             </p>
           </div>
           <a

@@ -205,8 +205,8 @@
 /* ── Speaker popup ───────────────────────────────────────── */
 .speaker-popup {
   position: absolute;
-  top: 0;
-  left: calc(100% + 16px);  /* appears to the right on desktop */
+  top: 200px;
+  left: calc(16px);  /* appears to the right on desktop */
   width: 340px;
   background: rgba(1, 18, 36, 0.97);
   border: 1px solid rgba(0, 200, 240, 0.3);
