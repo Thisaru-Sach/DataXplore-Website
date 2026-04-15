@@ -6,7 +6,7 @@ const RESOURCE_PERSONS = [
   {
     name: "Dr. Thiyanga Talagala",
     title: "Senior Lecturer",
-    org: "Department of Statistics, University Sri Jayawardenepura",
+    org: "Department of Statistics, University of Sri Jayawardenepura",
     bio: "",
     avatar: "", // leave empty for initials fallback
   },
