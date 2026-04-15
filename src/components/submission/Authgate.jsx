@@ -5,7 +5,7 @@ import { BYPASS_DATE_CHECK } from "../../config/dates";
 import { verifyTeam }        from "../../lib/teamAuth";
 import "./Authgate.css";
 
-const DATASET_DRIVE_URL = "https://drive.google.com/drive/folders/YOUR_FOLDER_ID";
+const DATASET_DRIVE_URL = "https://drive.google.com/drive/folders/14Z7UFQ438PP6i7y4w9vXtF83F7NQxSnH?usp=sharing";
 
 export default function AuthGate({ onAuthenticated, stage }) {
   const [nic, setNic] = useState("");
