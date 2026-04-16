@@ -141,7 +141,7 @@ function Guidelines() {
               <li>
                 <span className="n">03</span>Deadline for Stage 1:{" "}
                 <strong>
-                  {fmt(DATES.stage1Close, "long")} before 12:00 noon
+                  {fmt(DATES.stage1Close, "long")} before 11:59 pm 
                 </strong>
                 .
               </li>

@@ -268,14 +268,14 @@ export default function SubmissionPortal({ team, stage }) {
         )}
 
         {/* Instructions */}
-        <div className="portal-instructions">
+        {/* <div className="portal-instructions">
           <p className="portal-instructions__head">Submission Guidelines</p>
           <ul>
             {stageInfo.instructions.map((line, i) => (
               <li key={i}>{line}</li>
             ))}
           </ul>
-        </div>
+        </div> */}
 
         {/* Drop zone */}
         <div
