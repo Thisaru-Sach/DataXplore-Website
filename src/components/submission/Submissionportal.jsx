@@ -18,7 +18,7 @@ const MAX_TOTAL_MB     = 50;
 const STAGE_INFO = {
   1: {
     label:    "Stage 1 — Data Analysis & Report",
-    deadline: "24th April 2026 before 12:00 noon",
+    deadline: "24th April 2026 before 11:59 pm ",
     instructions: [
       "Upload your analysis report as a PDF.",
       "Include your R Markdown (.rmd), R Script (.R), or Jupyter Notebook (.ipynb).",
