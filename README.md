@@ -159,12 +159,12 @@ VITE_SUPABASE_URL=https://xxxxxxxxxxxx.supabase.co
 
 # Anon/public key — safe to use in frontend
 # Settings → API → anon public
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1N...
 
 # Service role key — bypasses RLS, admin only
 # Settings → API → service_role secret
 # Never expose this in public components — only used in adminSupabase.js
-VITE_SUPABASE_SERVICE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+VITE_SUPABASE_SERVICE_KEY=eyJhbGciOi...
 
 # Admin dashboard password
 VITE_ADMIN_PASSWORD=your_strong_password_here
