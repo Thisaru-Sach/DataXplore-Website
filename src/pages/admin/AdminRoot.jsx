@@ -1,28 +1,29 @@
 // src/pages/admin/AdminRoot.jsx
 // Password gate + shared layout for all /admin/* routes.
-// Uses React Router <Outlet /> so child routes render inside
-// the sidebar layout automatically.
-
-import { useState }                    from "react";
-import { Outlet, Link, useLocation,
-         useNavigate }                 from "react-router-dom";
+// Password is stored in sessionStorage so api calls can send it
+// to the server for re-validation on every request.
+import { useState }          from "react";
+import { Outlet, Link, useLocation } from "react-router-dom";
 import "./Admin.css";
 
-const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASSWORD;
+const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASSWORD; // still used for quick client check
 
 export default function AdminRoot() {
   const [authed, setAuthed] = useState(
     () => sessionStorage.getItem("admin_authed") === "true"
   );
 
-  function login(ok) {
-    setAuthed(ok);
-    if (ok) sessionStorage.setItem("admin_authed", "true");
+  function login(password) {
+    setAuthed(true);
+    sessionStorage.setItem("admin_authed",  "true");
+    // ✅ Store password so api/admin.js can re-validate every request
+    sessionStorage.setItem("admin_password", password);
   }
 
   function logout() {
     setAuthed(false);
     sessionStorage.removeItem("admin_authed");
+    sessionStorage.removeItem("admin_password");
   }
 
   if (!authed) return <AdminLogin onLogin={login} />;
@@ -33,14 +34,32 @@ export default function AdminRoot() {
 function AdminLogin({ onLogin }) {
   const [pass,  setPass]  = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function attempt(e) {
+  async function attempt(e) {
     e.preventDefault();
-    if (pass === ADMIN_PASS) {
-      onLogin(true);
-    } else {
-      setError("Incorrect password.");
-      setPass("");
+    setLoading(true);
+    setError("");
+
+    // Hit the server to check — the client-side VITE_ADMIN_PASSWORD
+    // check is removed so the real password is never in the bundle.
+    try {
+      const res = await fetch("/api/admin", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: pass, action: "get_teams", payload: {} }),
+      });
+
+      if (res.ok) {
+        onLogin(pass);
+      } else {
+        setError("Incorrect password.");
+        setPass("");
+      }
+    } catch {
+      setError("Could not connect to server. Try again.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -57,9 +76,12 @@ function AdminLogin({ onLogin }) {
             value={pass}
             onChange={e => setPass(e.target.value)}
             autoFocus
+            disabled={loading}
           />
           {error && <div className="adm-login-error">{error}</div>}
-          <button type="submit">Login →</button>
+          <button type="submit" disabled={loading}>
+            {loading ? "Checking…" : "Login →"}
+          </button>
         </form>
         <Link to="/" className="adm-back">← Back to website</Link>
       </div>
@@ -67,7 +89,7 @@ function AdminLogin({ onLogin }) {
   );
 }
 
-// ── Sidebar layout — wraps all admin child pages ───────────
+// ── Sidebar layout ─────────────────────────────────────────
 function AdminLayout({ onLogout }) {
   const loc = useLocation();
 
@@ -77,23 +99,13 @@ function AdminLayout({ onLogout }) {
 
   return (
     <div className="adm-wrap">
-      {/* Sidebar */}
       <aside className="adm-sidebar">
-        <div className="adm-brand">
-          ⬡ DataXplore
-          <small>Admin</small>
-        </div>
+        <div className="adm-brand">⬡ DataXplore<small>Admin</small></div>
         <nav className="adm-nav">
-          <Link
-            to="/admin"
-            className={`adm-link ${loc.pathname === "/admin" ? "adm-link--active" : ""}`}
-          >
+          <Link to="/admin" className={`adm-link ${loc.pathname === "/admin" ? "adm-link--active" : ""}`}>
             📋 Teams
           </Link>
-          <Link
-            to="/admin/submissions"
-            className={`adm-link ${isActive("/admin/submissions") ? "adm-link--active" : ""}`}
-          >
+          <Link to="/admin/submissions" className={`adm-link ${isActive("/admin/submissions") ? "adm-link--active" : ""}`}>
             📁 Submissions
           </Link>
         </nav>
@@ -102,8 +114,6 @@ function AdminLayout({ onLogout }) {
           <button className="adm-logout" onClick={onLogout}>Logout</button>
         </div>
       </aside>
-
-      {/* Child page renders here */}
       <main className="adm-main">
         <Outlet />
       </main>
