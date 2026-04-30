@@ -94,7 +94,7 @@ export default async function handler(req, res) {
         return res.status(200).json({ ok: true });
       }
 
-      case "delete_submission": {
+      case "delete_submission": { 
         // Remove file from storage first
         await supabase.storage
           .from("submissions")
