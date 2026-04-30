@@ -1,7 +1,7 @@
 // src/pages/admin/Dashboard.jsx
 import { useEffect, useState } from "react";
 import { Link }                from "react-router-dom";
-import { getAllTeams, setEligibility, adminSupabase } from "../../lib/adminsupabase";
+import { getAllTeams, setEligibility, insertTeam } from "../../lib/adminsupabase";
 import "./Admin.css";
 
 const EMPTY = {
@@ -91,7 +91,7 @@ export default function Dashboard() {
         stage3_eligible:    form.stage3_eligible,
       };
 
-      const { error } = await adminSupabase.from("teams").insert(payload);
+      const { error } = await insertTeam.from("teams").insert(payload);
       if (error) throw new Error(error.message);
 
       setShowAdd(false);

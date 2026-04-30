@@ -17,15 +17,15 @@ export default function App() {
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<Home />} />
-        {/* <Route path="/submit" element={<Submit />} /> */}
+        <Route path="/submit" element={<Submit />} />
 
         {/* Admin routes — all nested under /admin
             AdminRoot handles password gate + layout  */}
-        {/* <Route path="/admin" element={<AdminRoot />}> */}
-          {/* <Route index element={<Dashboard />} /> */}
-          {/* <Route path="teams/:id" element={<TeamDetail />} /> */}
-          {/* <Route path="submissions" element={<Submissions />} /> */}
-        {/* </Route> */}
+        <Route path="/admin" element={<AdminRoot />}>
+          <Route index element={<Dashboard />} />
+          <Route path="teams/:id" element={<TeamDetail />} />
+          <Route path="submissions" element={<Submissions />} />
+        </Route>
 
         {/* Catch-all */}
         <Route path="*" element={<Home />} />
