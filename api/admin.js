@@ -129,6 +129,14 @@ export default async function handler(req, res) {
     }
 
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    // This will tell you if it's "supabaseUrl is required" or a DB error
+    return res.status(500).json({ 
+      error: err.message, 
+      stack: err.stack,
+      envCheck: {
+        hasUrl: !!process.env.SUPABASE_URL,
+        hasKey: !!process.env.SUPABASE_SERVICE_KEY
+      }
+    });
   }
 }
