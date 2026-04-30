@@ -1,12 +1,28 @@
 // supabase/functions/team-auth/index.ts
-// Verifies a team by registration_number + email.
-// Returns full team record so the portal has all data it needs.
-
+// ─────────────────────────────────────────────────────────
+//  Supabase Edge Function — Team Authentication
+//
+//  Updated for new Supabase API keys:
+//  - Uses SECRET_KEY env var (manually set in Edge Function secrets)
+//    instead of the auto-injected SUPABASE_SERVICE_ROLE_KEY which
+//    still contains the old legacy JWT even after migration.
+//
+//  How to set the secret in Supabase dashboard:
+//    Edge Functions → team-auth → Secrets → Add new secret
+//    Name:  SECRET_KEY
+//    Value: your sb_secret_... key
+//
+//  JWT verification must remain OFF for this function:
+//    Edge Functions → team-auth → Details → Enforce JWT Verification: OFF
+// ─────────────────────────────────────────────────────────
 import { serve }        from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const SUPABASE_URL     = Deno.env.get("SUPABASE_URL")!;
-const SUPABASE_SERVICE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+// Use manually set SECRET_KEY — NOT SUPABASE_SERVICE_ROLE_KEY
+// because the auto-injected var still holds the old legacy JWT key
+// even after disabling legacy keys (known Supabase bug).
+const SUPABASE_SERVICE = Deno.env.get("SECRET_KEY")!;
 
 const cors = {
   "Access-Control-Allow-Origin":  "*",
@@ -22,17 +38,22 @@ function json(body: unknown, status = 200) {
 }
 
 serve(async (req) => {
+  // CORS preflight — must return 200 with null body
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 200, headers: cors });
   }
+
   if (req.method !== "POST") {
     return json({ error: "Method not allowed" }, 405);
   }
 
   try {
     let body: { nic_number?: string; email?: string };
-    try { body = await req.json(); }
-    catch { return json({ error: "Invalid JSON body" }, 400); }
+    try {
+      body = await req.json();
+    } catch {
+      return json({ error: "Invalid JSON body" }, 400);
+    }
 
     const { nic_number, email } = body;
 
@@ -40,9 +61,9 @@ serve(async (req) => {
       return json({ error: "nic_number and email are required" }, 400);
     }
 
+    // sb_secret_ key works identically to service_role in createClient
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE);
 
-    // Select all fields the portal needs
     const { data: team, error: dbError } = await supabase
       .from("teams")
       .select(
@@ -57,7 +78,7 @@ serve(async (req) => {
 
     if (dbError || !team) {
       return json(
-        { error: "Team not found. Check your nic number and email." },
+        { error: "Team not found. Check your NIC number and email." },
         401
       );
     }

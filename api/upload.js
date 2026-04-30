@@ -2,22 +2,19 @@
 // ─────────────────────────────────────────────────────────
 //  Vercel Serverless Function — File Upload
 //
-//  Receives the zip file as a base64 string plus metadata.
-//  Uploads to Supabase Storage and saves DB row — all using
-//  the SERVICE KEY which stays on the server.
-//
-//  Max payload: configure in vercel.json (default 4.5 MB —
-//  increase to 50 MB for large zips, see vercel.json below).
+//  Updated for Supabase new API keys:
+//  SUPABASE_SERVICE_KEY now holds sb_secret_... instead of eyJ...
+//  No other changes needed — createClient works identically.
 // ─────────────────────────────────────────────────────────
 import { createClient } from "@supabase/supabase-js";
 
 const SUPABASE_URL     = process.env.SUPABASE_URL;
-const SUPABASE_SERVICE = process.env.SUPABASE_SERVICE_KEY;
+const SUPABASE_SERVICE = process.env.SUPABASE_SERVICE_KEY; // sb_secret_...
 
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: "55mb",   // must be > your zip size limit
+      sizeLimit: "55mb",
     },
   },
 };
@@ -36,17 +33,20 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
-  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE);
+  // New sb_secret_ keys work identically to service_role in createClient
+  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE, {
+    auth: { persistSession: false },
+  });
 
-  // Convert base64 → Buffer → Uint8Array for Supabase upload
-  const buffer  = Buffer.from(fileBase64, "base64");
-  const uint8   = new Uint8Array(buffer);
+  // Convert base64 → Buffer → Uint8Array for Supabase storage upload
+  const buffer = Buffer.from(fileBase64, "base64");
+  const uint8  = new Uint8Array(buffer);
 
-  const safeFolder = teamName.replace(/[^a-zA-Z0-9._-]/g, "_");
-  const safeName   = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
+  const safeFolder  = teamName.replace(/[^a-zA-Z0-9._-]/g, "_");
+  const safeName    = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
   const storagePath = `stage${stage}/${safeFolder}/${safeName}`;
 
-  // Upload to storage
+  // Upload to Supabase Storage
   const { data: uploadData, error: uploadErr } = await supabase.storage
     .from("submissions")
     .upload(storagePath, uint8, {
@@ -58,7 +58,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: uploadErr.message });
   }
 
-  // Save metadata row
+  // Save metadata row to submissions table
   const { data: record, error: dbErr } = await supabase
     .from("submissions")
     .insert({

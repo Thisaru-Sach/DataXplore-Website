@@ -1,31 +1,32 @@
 // src/lib/supabase.js
 // ─────────────────────────────────────────────────────────
-//  Public Supabase client — anon key only.
-//  The service key has been moved to /api/* server functions.
+//  Public Supabase client — publishable key only.
 //
-//  uploadFile() now sends the zip to /api/upload (serverless)
-//  which does the actual storage write with the service key.
+//  Updated for Supabase new API keys:
+//  VITE_SUPABASE_ANON_KEY now holds sb_publishable_... instead of eyJ...
+//  No other code changes needed — createClient works identically.
 //
-//  The only env vars here are VITE_ prefixed (anon key + URL).
-//  These are intentionally public — Supabase designed them
-//  to be exposed; your RLS policies are the real security.
+//  The publishable key (sb_publishable_...) is intentionally public.
+//  Your RLS policies are what protect your data, not the key.
 // ─────────────────────────────────────────────────────────
 import { createClient } from "@supabase/supabase-js";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY; // now sb_publishable_...
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: { storageKey: "public-supabase" },
+  auth: {
+    persistSession: true,
+    storageKey:     "public-supabase", // prevents GoTrueClient conflict with admin
+  },
 });
 
 export const BUCKET = "submissions";
 
 // ── Upload via serverless function ─────────────────────────
 // Converts zip to base64 and sends to /api/upload.
-// The service key used for storage write stays on the server.
+// The secret key used for storage write stays on the server.
 export async function uploadFile(zipFile, stage, teamName, teamId, notes) {
-  // Read zip as base64
   const base64 = await new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload  = () => resolve(reader.result.split(",")[1]);
@@ -50,12 +51,11 @@ export async function uploadFile(zipFile, stage, teamName, teamId, notes) {
   const json = await res.json();
   if (!res.ok) throw new Error(json.error || "Upload failed");
 
-  // Return both storage path and saved DB record
   return { path: json.path, record: json.record };
 }
 
-// ── Check for existing submission ─────────────────────────
-// Uses anon client — RLS allows anon SELECT (added in schema setup)
+// ── Check for existing submission for this team + stage ────
+// RLS allows anon SELECT on submissions table (set in schema.sql)
 export async function getExistingSubmission(teamId, stage) {
   const { data, error } = await supabase
     .from("submissions")
@@ -67,15 +67,12 @@ export async function getExistingSubmission(teamId, stage) {
     .maybeSingle();
 
   if (error) throw new Error(error.message);
-  return data;
+  return data; // null if no prior submission
 }
 
-// ── Delete old submission before resubmit ─────────────────
-// Calls admin API (which has service key) to delete storage + row
-// Requires admin password stored in sessionStorage if user is admin,
-// OR you can make a separate /api/delete-submission endpoint.
-// For now we use anon client to delete the row (allowed by RLS policy)
-// and the upload API overwrites the file with upsert:true.
+// ── Delete old submission DB row before resubmitting ───────
+// RLS allows anon DELETE because we set "Allow anon inserts/selects"
+// The storage file is overwritten via upsert:true in /api/upload
 export async function deleteSubmissionRow(submissionId) {
   const { error } = await supabase
     .from("submissions")

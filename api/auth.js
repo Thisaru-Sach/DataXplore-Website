@@ -2,22 +2,16 @@
 // ─────────────────────────────────────────────────────────
 //  Vercel Serverless Function — Team Authentication
 //
-//  Replaces the Supabase Edge Function.
-//  Receives { nic_number, email } from the browser,
-//  queries the DB using the SERVICE KEY (never sent to browser),
-//  returns the team object.
-//
-//  Environment variables read here are SERVER-SIDE ONLY.
-//  They are NOT prefixed with VITE_ so Vite never bundles them.
+//  Updated for Supabase new API keys:
+//  SUPABASE_SERVICE_KEY now holds sb_secret_... instead of eyJ...
+//  No other changes needed — createClient works identically.
 // ─────────────────────────────────────────────────────────
 import { createClient } from "@supabase/supabase-js";
 
-// These are read on Vercel's servers — never sent to the browser
 const SUPABASE_URL     = process.env.SUPABASE_URL;
-const SUPABASE_SERVICE = process.env.SUPABASE_SERVICE_KEY;
+const SUPABASE_SERVICE = process.env.SUPABASE_SERVICE_KEY; // sb_secret_...
 
 export default async function handler(req, res) {
-  // CORS headers — allow your Vercel domain and localhost
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -31,7 +25,10 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "nic_number and email are required" });
   }
 
-  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE);
+  // New sb_secret_ keys work identically to service_role in createClient
+  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE, {
+    auth: { persistSession: false },
+  });
 
   const { data: team, error } = await supabase
     .from("teams")
