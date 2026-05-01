@@ -1,25 +1,8 @@
 // api/admin.js
-// ─────────────────────────────────────────────────────────
-//  Vercel Serverless Function — Admin Operations
-//
-//  Updated for Supabase new API keys:
-//  SUPABASE_SERVICE_KEY now holds sb_secret_... instead of eyJ...
-//  No other changes needed — createClient works identically.
-//
-//  Actions (passed as req.body.action):
-//    get_teams          → all teams from admin_submission_overview
-//    get_submissions    → all submissions (optional stage filter)
-//    get_team           → single team by id
-//    get_team_subs      → submissions for one team
-//    set_eligibility    → toggle stage1/stage3_eligible
-//    delete_submission  → remove storage file + DB row
-//    get_download_url   → 5-min signed download URL
-//    insert_team        → add a new team row
-// ─────────────────────────────────────────────────────────
 import { createClient } from "@supabase/supabase-js";
 
 const SUPABASE_URL     = process.env.SUPABASE_URL;
-const SUPABASE_SERVICE = process.env.SUPABASE_SERVICE_KEY; // sb_secret_...
+const SUPABASE_SERVICE = process.env.SUPABASE_SERVICE_KEY;
 const ADMIN_PASSWORD   = process.env.ADMIN_PASSWORD;
 
 export default async function handler(req, res) {
@@ -32,12 +15,21 @@ export default async function handler(req, res) {
 
   const { password, action, payload } = req.body ?? {};
 
-  // ── Password check — every request must pass this ──────
+  // ── Env var check — helps diagnose missing variables ──
+  if (!SUPABASE_URL || !SUPABASE_SERVICE || !ADMIN_PASSWORD) {
+    console.error("Missing env vars:", {
+      hasUrl:      !!SUPABASE_URL,
+      hasService:  !!SUPABASE_SERVICE,
+      hasPassword: !!ADMIN_PASSWORD,
+    });
+    return res.status(500).json({ error: "Server misconfiguration — missing environment variables" });
+  }
+
+  // ── Password check ─────────────────────────────────────
   if (!password || password !== ADMIN_PASSWORD) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  // New sb_secret_ keys work identically to service_role in createClient
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE, {
     auth: { persistSession: false },
   });
@@ -49,7 +41,10 @@ export default async function handler(req, res) {
         const { data, error } = await supabase
           .from("admin_submission_overview")
           .select("*");
-        if (error) throw error;
+        if (error) {
+          console.error("get_teams error:", error);
+          throw error;
+        }
         return res.status(200).json({ data });
       }
 
@@ -60,7 +55,7 @@ export default async function handler(req, res) {
           .order("submitted_at", { ascending: false });
         if (payload?.stage) query = query.eq("stage", payload.stage);
         const { data, error } = await query;
-        if (error) throw error;
+        if (error) { console.error("get_submissions error:", error); throw error; }
         return res.status(200).json({ data });
       }
 
@@ -70,7 +65,7 @@ export default async function handler(req, res) {
           .select("*")
           .eq("id", payload.id)
           .single();
-        if (error) throw error;
+        if (error) { console.error("get_team error:", error); throw error; }
         return res.status(200).json({ data });
       }
 
@@ -80,7 +75,7 @@ export default async function handler(req, res) {
           .select("*")
           .eq("team_id", payload.teamId)
           .order("submitted_at", { ascending: false });
-        if (error) throw error;
+        if (error) { console.error("get_team_subs error:", error); throw error; }
         return res.status(200).json({ data });
       }
 
@@ -90,29 +85,25 @@ export default async function handler(req, res) {
           .from("teams")
           .update({ [field]: payload.value })
           .eq("id", payload.teamId);
-        if (error) throw error;
+        if (error) { console.error("set_eligibility error:", error); throw error; }
         return res.status(200).json({ ok: true });
       }
 
-      case "delete_submission": { 
-        // Remove file from storage first
-        await supabase.storage
-          .from("submissions")
-          .remove([payload.filePath]);
-        // Then delete the DB row
+      case "delete_submission": {
+        await supabase.storage.from("submissions").remove([payload.filePath]);
         const { error } = await supabase
           .from("submissions")
           .delete()
           .eq("id", payload.submissionId);
-        if (error) throw error;
+        if (error) { console.error("delete_submission error:", error); throw error; }
         return res.status(200).json({ ok: true });
       }
 
       case "get_download_url": {
         const { data, error } = await supabase.storage
           .from("submissions")
-          .createSignedUrl(payload.filePath, 300); // 5-minute URL
-        if (error) throw error;
+          .createSignedUrl(payload.filePath, 300);
+        if (error) { console.error("get_download_url error:", error); throw error; }
         return res.status(200).json({ url: data.signedUrl });
       }
 
@@ -120,7 +111,7 @@ export default async function handler(req, res) {
         const { error } = await supabase
           .from("teams")
           .insert(payload.team);
-        if (error) throw error;
+        if (error) { console.error("insert_team error:", error); throw error; }
         return res.status(200).json({ ok: true });
       }
 
@@ -129,6 +120,7 @@ export default async function handler(req, res) {
     }
 
   } catch (err) {
+    console.error("api/admin unhandled error:", err.message);
     return res.status(500).json({ error: err.message });
   }
 }
