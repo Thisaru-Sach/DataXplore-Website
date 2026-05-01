@@ -11,7 +11,6 @@ const EMPTY = {
   nic_number: "", student_id_url: "",
   email: "", contact_number: "", academic_year: "",
   team_name: "", member_count: "3",
-  // ✅ FIX: field names match schema columns exactly (member1, not member1_name)
   member1: "",
   member2: "",
   member3: "",
@@ -52,7 +51,6 @@ export default function Dashboard() {
     e.preventDefault();
     setFormErr("");
 
-    // ✅ FIX: validate correct field names
     const required = ["full_name", "university", "email", "team_name",
                       "member1", "member2", "member3"];
     const missing = required.filter(k => !form[k].trim());
@@ -82,17 +80,17 @@ export default function Dashboard() {
         academic_year:      form.academic_year      || null,
         team_name:          form.team_name.trim(),
         member_count:       parseInt(form.member_count),
-        // ✅ FIX: use member1/2/3/4 directly matching schema
         member1: form.member1.trim() || null,
         member2: form.member2.trim() || null,
         member3: form.member3.trim() || null,
         member4: parseInt(form.member_count) === 4 ? (form.member4.trim() || null) : null,
-        stage1_eligible:    form.stage1_eligible,
-        stage3_eligible:    form.stage3_eligible,
+        stage1_eligible: form.stage1_eligible,
+        stage3_eligible: form.stage3_eligible,
       };
 
-      const { error } = await insertTeam.from("teams").insert(payload);
-      if (error) throw new Error(error.message);
+      // ✅ FIX: insertTeam is a plain async function — call it directly
+      // Do NOT use insertTeam.from(...) — that was the old Supabase client syntax
+      await insertTeam(payload);
 
       setShowAdd(false);
       setForm(EMPTY);
@@ -280,7 +278,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* ✅ FIX: Members — use name="member1" not name="member1_name" */}
+              {/* Members */}
               <div className="adm-form-section">
                 <div className="adm-form-section-title">
                   Team Members
