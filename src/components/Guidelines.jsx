@@ -167,9 +167,8 @@ function Guidelines() {
                 at the <strong>BLC, Faculty of Applied Sciences, USJ</strong>.
               </li>
               <li>
-                <span className="n">02</span>This is a{" "}
-                <strong>closed-book</strong> competition; no external resources
-                are permitted during the task.
+                <span className="n">02</span>This is an{" "}
+                <strong>open-book</strong>, where relevant resources and limited AI usage can be used during the task.
               </li>
               <li>
                 <span className="n">03</span>The <strong>top 5 teams</strong>{" "}
