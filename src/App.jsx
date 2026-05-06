@@ -17,7 +17,7 @@ export default function App() {
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<Home />} />
-        <Route path="/submit" element={<Submit />} />
+        {/* <Route path="/submit" element={<Submit />} /> */}
 
         {/* Admin routes — all nested under /admin
             AdminRoot handles password gate + layout  */}
