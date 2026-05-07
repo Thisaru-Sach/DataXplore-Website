@@ -38,7 +38,7 @@ const STAGE_INFO = {
       "Do NOT include your university name or personal info in the files.",
       "Only include your Team Name.",
       "All files will be zipped automatically before upload.",
-      "Only one submission is allowed — uploading again replaces your previous file.",
+      "Only one submission is allowed. Uzploading again replaces your previous file.",
     ],
   },
 };
