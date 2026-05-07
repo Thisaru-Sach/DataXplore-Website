@@ -1,17 +1,11 @@
-// src/components/submission/SubmissionBanner.jsx
-// ─────────────────────────────────────────────────────────
-//  Shown on the Home page between Hero and About.
-//  Reads the current phase and renders the appropriate
-//  status message + CTA button.
-// ─────────────────────────────────────────────────────────
+// src/components/submission/Submissionbanner.jsx
 import { Link } from "react-router-dom";
-import { getPhase, BYPASS_DATE_CHECK, DATES } from "../../config/dates";
-import "./SubmissionBanner.css";
+import { getPhase, BYPASS_DATE_CHECK, DATES, fmt } from "../../config/dates";
+import "./Submissionbanner.css";
 
 export default function SubmissionBanner() {
   const phase = getPhase();
 
-  // Config for each phase
   const config = {
     bypass: {
       type:  "info",
@@ -45,11 +39,11 @@ export default function SubmissionBanner() {
       type:  "open",
       icon:  "🚀",
       label: "STAGE 1 SUBMISSION OPEN",
-      text:  `Submit your EDA report before ${fmt(DATES.stage1Close)}.`,
+      text:  `Submit your EDA report before ${fmt(DATES.stage1Close, "full")}.`,
       cta:   { label: "Upload Files →", to: "/submit" },
     },
     stage1_closed: {
-      type:  "closed",
+      type:  "waiting",
       icon:  "✅",
       label: "STAGE 1 SUBMISSIONS CLOSED",
       text:  `Top 10 teams will be announced on ${fmt(DATES.top10Announce)}.`,
@@ -59,7 +53,8 @@ export default function SubmissionBanner() {
       type:  "open",
       icon:  "🏆",
       label: "STAGE 3 SUBMISSION OPEN",
-      text:  `Submit your final report and dashboard before ${fmt(DATES.stage3Close)}.`,
+      // Show both open and close times for Stage 3
+      text:  `Open from ${fmt(DATES.stage3Open, "datetime")} — closes ${fmt(DATES.stage3Close, "datetime")}.`,
       cta:   { label: "Upload Files →", to: "/submit" },
     },
     stage3_closed: {
@@ -88,12 +83,10 @@ export default function SubmissionBanner() {
         {c.cta && (
           <div className="sub-banner__right">
             {c.cta.to ? (
-              /* Internal React Router link */
               <Link to={c.cta.to} className="sub-banner__btn">
                 {c.cta.label}
               </Link>
             ) : (
-              /* External link (registration form) */
               <a href={c.cta.href} target="_blank" rel="noreferrer" className="sub-banner__btn">
                 {c.cta.label}
               </a>
@@ -103,11 +96,4 @@ export default function SubmissionBanner() {
       </div>
     </div>
   );
-}
-
-// Format date nicely: "28 Mar 2026"
-function fmt(date) {
-  return date.toLocaleDateString("en-GB", {
-    day: "numeric", month: "short", year: "numeric",
-  });
 }

@@ -1,14 +1,11 @@
 // src/components/submission/Submissionportal.jsx
-// Only change from previous version: uploadFile() now returns
-// { path, record } instead of just a path string, because
-// the server saves the DB row and returns it.
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Link }                                      from "react-router-dom";
 import JSZip                                         from "jszip";
+import { DATES, fmt }                                from "../../config/dates";
 import {
   uploadFile,
   getExistingSubmission,
-  deleteSubmissionRow,
 } from "../../lib/supabase";
 import "./Submissionportal.css";
 
@@ -19,7 +16,7 @@ const MAX_TOTAL_MB     = 50;
 const STAGE_INFO = {
   1: {
     label:    "Stage 1 — Data Analysis & Report",
-    deadline: "24th April 2026 before 12:00 noon",
+    deadline: `${fmt(DATES.stage1Close, "long")} before midnight`,
     instructions: [
       "Upload your analysis report as a PDF.",
       "Include your R Markdown (.rmd), R Script (.R), or Jupyter Notebook (.ipynb).",
@@ -31,7 +28,9 @@ const STAGE_INFO = {
   },
   3: {
     label:    "Stage 3 — Dashboard Competition",
-    deadline: "10th May 2026",
+    // Stage 3 deadline pulled from dates.js
+    deadline: fmt(DATES.stage3Close, "datetime"),
+    opensAt:  fmt(DATES.stage3Open,  "datetime"),
     instructions: [
       "Upload your final full report as a PDF.",
       "Include your dashboard file or a PDF export of the dashboard.",
@@ -39,6 +38,7 @@ const STAGE_INFO = {
       "Do NOT include your university name or personal info in the files.",
       "Only include your Team Name.",
       "All files will be zipped automatically before upload.",
+      "Only one submission is allowed — uploading again replaces your previous file.",
     ],
   },
 };
@@ -56,8 +56,11 @@ export default function SubmissionPortal({ team, stage }) {
 
   const inputRef  = useRef(null);
   const stageInfo = STAGE_INFO[stage] || STAGE_INFO[1];
-  const eligible  = stage === 1 ? team.stage1_eligible : team.stage3_eligible;
 
+  // Stage 3 eligibility — must have stage3_eligible = true
+  const eligible = stage === 1 ? team.stage1_eligible : team.stage3_eligible;
+
+  // Check for an existing submission on mount
   useEffect(() => {
     async function check() {
       try {
@@ -97,25 +100,28 @@ export default function SubmissionPortal({ team, stage }) {
   const hasValid   = validFiles.length > 0 && !tooLarge;
   const hasInvalid = files.some(f => f.error);
 
-  function onDrop(e)      { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files); }
-  function onDragOver(e)  { e.preventDefault(); setDragOver(true); }
-  function onDragLeave()  { setDragOver(false); }
+  function onDrop(e)     { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files); }
+  function onDragOver(e) { e.preventDefault(); setDragOver(true); }
+  function onDragLeave() { setDragOver(false); }
 
   async function handleSubmit() {
     if (!hasValid || submitting) return;
 
+    // Confirmation dialog if replacing an existing submission
     if (existing) {
       const confirmed = window.confirm(
         `You already have a submission for Stage ${stage}:\n` +
         `"${existing.file_name}"\n` +
         `Submitted: ${new Date(existing.submitted_at).toLocaleString("en-GB")}\n\n` +
-        `Proceeding will DELETE the previous submission.\n\nContinue?`
+        `Proceeding will PERMANENTLY DELETE the previous submission\n` +
+        `and replace it with your new files.\n\nContinue?`
       );
       if (!confirmed) return;
     }
 
     setSubmitting(true);
     try {
+      // Step 1: Zip files
       setProgress("Compressing files…");
       const zip    = new JSZip();
       const folder = zip.folder(`${team.team_name}_stage${stage}`);
@@ -130,13 +136,10 @@ export default function SubmissionPortal({ team, stage }) {
       const zipName   = `${team.team_name}_stage${stage}_${timestamp}.zip`;
       const zipFile   = new File([zipBlob], zipName, { type: "application/zip" });
 
-      if (existing) {
-        setProgress("Removing previous submission…");
-        try { await deleteSubmissionRow(existing.id); } catch {}
-      }
-
+      // Step 2: Upload — server handles deleting old file + DB row automatically
+      // api/upload.js checks for existing submission, deletes storage file + DB row,
+      // then saves the new file. No need to delete here.
       setProgress("Uploading to server…");
-      // ✅ uploadFile now handles both storage upload AND DB insert server-side
       const { record } = await uploadFile(
         zipFile, stage, team.team_name, team.id, notes.trim() || null
       );
@@ -153,6 +156,7 @@ export default function SubmissionPortal({ team, stage }) {
     }
   }
 
+  // ── Not eligible ───────────────────────────────────────
   if (!eligible) {
     return (
       <div className="portal-wrap">
@@ -160,8 +164,9 @@ export default function SubmissionPortal({ team, stage }) {
           <div className="success-icon">🔒</div>
           <h2 className="portal-title">Not Eligible for Stage {stage}</h2>
           <p className="portal-sub">
-            Your team is not currently eligible to submit for Stage {stage}.
-            {stage === 3 && " Only Top 10 teams from Stage 1 can submit for Stage 3."}
+            {stage === 3
+              ? "Only the Top 10 teams selected after Stage 1 can submit for Stage 3."
+              : `Your team is not currently eligible to submit for Stage ${stage}.`}
           </p>
           <Link to="/" className="btn-outline-sub">← Back to Home</Link>
         </div>
@@ -169,6 +174,7 @@ export default function SubmissionPortal({ team, stage }) {
     );
   }
 
+  // ── Success ────────────────────────────────────────────
   if (submitted) {
     return (
       <div className="portal-wrap">
@@ -176,56 +182,82 @@ export default function SubmissionPortal({ team, stage }) {
           <div className="success-icon">✅</div>
           <h2 className="portal-title">Submission Received!</h2>
           <p className="portal-sub">
-            Your files for <strong>{stageInfo.label}</strong> have been uploaded successfully.
+            Your files for <strong>{stageInfo.label}</strong> have been
+            uploaded and saved successfully.
           </p>
           <div className="success-meta">
             <div><span>Team</span><strong>{team.team_name}</strong></div>
             <div><span>Stage</span><strong>{stage}</strong></div>
             <div><span>Files zipped</span><strong>{validFiles.length} file(s)</strong></div>
             {uploadedMeta && (
-              <div><span>Submitted at</span>
+              <div>
+                <span>Submitted at</span>
                 <strong>{new Date(uploadedMeta.submitted_at).toLocaleString("en-GB")}</strong>
               </div>
             )}
           </div>
-          <p className="portal-note">Screenshot this for your records.</p>
+          <p className="portal-note">
+            Screenshot this page for your records. If you need to resubmit, log in again before the deadline.
+          </p>
           <Link to="/" className="btn-outline-sub">← Back to Home</Link>
         </div>
       </div>
     );
   }
 
+  // ── Upload form ────────────────────────────────────────
   return (
     <div className="portal-wrap">
       <div className="portal-card">
+
+        {/* Header */}
         <div className="portal-header">
           <span className="portal-eyebrow">DataXplore 2.0</span>
           <h1 className="portal-title">{stageInfo.label}</h1>
           <div className="portal-team-badge">
             <span>👥 {team.team_name}</span>
           </div>
-          <div className="portal-deadline">
-            ⏰ Deadline: <strong>{stageInfo.deadline}</strong>
-          </div>
+
+          {/* Stage 3 shows both open and close times */}
+          {stage === 3 ? (
+            <div className="portal-stage3-times">
+              <span className="portal-time-item portal-time-item--open">
+                🟢 Opened: <strong>{stageInfo.opensAt}</strong>
+              </span>
+              <span className="portal-time-item portal-time-item--close">
+                🔴 Closes: <strong>{stageInfo.deadline}</strong>
+              </span>
+            </div>
+          ) : (
+            <div className="portal-deadline">
+              ⏰ Deadline: <strong>{stageInfo.deadline}</strong>
+            </div>
+          )}
         </div>
 
+        {/* Existing submission warning */}
         {!checkingPrev && existing && (
           <div className="portal-resubmit-notice">
             <span className="portal-resubmit-icon">⚠️</span>
             <div>
-              <strong>Existing submission for Stage {stage}</strong>
+              <strong>You have an existing Stage {stage} submission</strong>
               <p>File: <code>{existing.file_name}</code><br />
                 Submitted: {new Date(existing.submitted_at).toLocaleString("en-GB")}</p>
-              <p>Uploading new files will <strong>permanently replace</strong> this submission.</p>
+              <p>
+                Uploading new files will <strong>permanently delete</strong> your
+                previous submission from the server and replace it.
+              </p>
             </div>
           </div>
         )}
 
+        {/* Instructions */}
         <div className="portal-instructions">
           <p className="portal-instructions__head">Submission Guidelines</p>
           <ul>{stageInfo.instructions.map((line, i) => <li key={i}>{line}</li>)}</ul>
         </div>
 
+        {/* Drop zone */}
         <div
           className={`drop-zone ${dragOver ? "drop-zone--over" : ""}`}
           onDrop={onDrop} onDragOver={onDragOver} onDragLeave={onDragLeave}
@@ -234,13 +266,19 @@ export default function SubmissionPortal({ team, stage }) {
           onKeyDown={e => e.key === "Enter" && !submitting && inputRef.current?.click()}
         >
           <input ref={inputRef} type="file" multiple style={{ display:"none" }}
-            accept={ACCEPTED_EXT.join(",")} onChange={e => addFiles(e.target.files)} disabled={submitting} />
+            accept={ACCEPTED_EXT.join(",")} onChange={e => addFiles(e.target.files)}
+            disabled={submitting} />
           <div className="drop-zone__icon">📂</div>
-          <p className="drop-zone__main">{dragOver ? "Drop files here" : "Drag & drop files, or click to browse"}</p>
-          <p className="drop-zone__sub">Accepted: {ACCEPTED_EXT.join(", ")} · Max {MAX_FILE_SIZE_MB} MB per file</p>
-          <p className="drop-zone__sub">Files will be zipped automatically before upload.</p>
+          <p className="drop-zone__main">
+            {dragOver ? "Drop files here" : "Drag & drop files, or click to browse"}
+          </p>
+          <p className="drop-zone__sub">
+            Accepted: {ACCEPTED_EXT.join(", ")} · Max {MAX_FILE_SIZE_MB} MB per file
+          </p>
+          <p className="drop-zone__sub">All files will be zipped automatically before upload.</p>
         </div>
 
+        {/* File list */}
         {files.length > 0 && (
           <>
             <ul className="file-list">
@@ -253,7 +291,9 @@ export default function SubmissionPortal({ team, stage }) {
                     {entry.error && <span className="file-error">{entry.error}</span>}
                   </div>
                   <span className="file-status">{entry.error && "✕"}</span>
-                  {!submitting && <button className="file-remove" onClick={() => removeFile(entry.id)}>×</button>}
+                  {!submitting && (
+                    <button className="file-remove" onClick={() => removeFile(entry.id)}>×</button>
+                  )}
                 </li>
               ))}
             </ul>
@@ -264,23 +304,34 @@ export default function SubmissionPortal({ team, stage }) {
           </>
         )}
 
+        {/* Notes */}
         <div className="portal-notes">
           <label htmlFor="notes">Notes to Organizers <span>(optional)</span></label>
           <textarea id="notes" rows={3} placeholder="Any notes about your submission…"
             value={notes} onChange={e => setNotes(e.target.value)} disabled={submitting} />
         </div>
 
-        {hasInvalid && <div className="portal-warning">⚠ Files with errors will be skipped.</div>}
-
-        {submitting && progress && (
-          <div className="portal-progress"><span className="spinner-dot" /><span>{progress}</span></div>
+        {hasInvalid && (
+          <div className="portal-warning">⚠ Files with errors will be skipped.</div>
         )}
 
-        <button className="portal-submit" disabled={!hasValid || submitting} onClick={handleSubmit}>
+        {submitting && progress && (
+          <div className="portal-progress">
+            <span className="spinner-dot" />
+            <span>{progress}</span>
+          </div>
+        )}
+
+        <button
+          className="portal-submit"
+          disabled={!hasValid || submitting}
+          onClick={handleSubmit}
+        >
           {submitting ? "Processing…" : existing
-            ? `Replace & Submit ${validFiles.length} File(s) →`
+            ? `Replace Previous & Submit ${validFiles.length} File(s) →`
             : `Zip & Submit ${validFiles.length} File(s) →`}
         </button>
+
         <Link to="/" className="auth-back">← Back to Home</Link>
       </div>
     </div>
@@ -292,6 +343,7 @@ function formatSize(bytes) {
   if (bytes < 1024 * 1024)  return (bytes / 1024).toFixed(1) + " KB";
   return (bytes / (1024 * 1024)).toFixed(1) + " MB";
 }
+
 function fileIcon(name) {
   const ext = name.split(".").pop().toLowerCase();
   const map = { pdf:"📄", xlsx:"📊", xls:"📊", r:"📈", rmd:"📈", ipynb:"🐍", py:"🐍", csv:"📋", mtw:"📉", mtj:"📉" };
