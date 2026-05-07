@@ -383,3 +383,31 @@
   background: rgba(0, 0, 0, 0.2);
   padding: 1px 5px;
 }
+
+/* ── Append these to the bottom of Submissionportal.css ──── */
+
+/* Stage 3 open/close time display under team badge */
+.portal-stage3-times {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.portal-time-item {
+  font-family: var(--ff-mono);
+  font-size: 0.68rem;
+  letter-spacing: 1px;
+}
+
+.portal-time-item--open  { color: #40d080; }
+.portal-time-item--close { color: #ff8080; }
+
+.portal-time-item strong {
+  color: var(--white);
+}
+
+@media (max-width: 600px) {
+  .portal-stage3-times { gap: 4px; }
+  .portal-time-item    { font-size: 0.62rem; }
+}

@@ -284,3 +284,122 @@
     justify-content: center;
   }
 }
+
+/* ── Append these to your existing Authgate.css ─────────── */
+
+/* Stage 3 eligibility reminder below subtitle */
+.auth-stage3-note {
+  margin-top: 10px;
+  background: rgba(245, 162, 0, 0.07);
+  border: 1px solid rgba(245, 162, 0, 0.25);
+  color: var(--muted);
+  font-size: 0.83rem;
+  line-height: 1.5;
+  padding: 9px 13px;
+}
+.auth-stage3-note strong {
+  color: var(--orange);
+}
+
+/* Dataset box — sits between header and form */
+.auth-dataset-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(0, 200, 240, 0.05);
+  border: 1px solid rgba(0, 200, 240, 0.22);
+  padding: 14px 16px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+/* Stage 3 gets an orange tint to visually distinguish */
+.auth-dataset-box--stage3 {
+  background: rgba(245, 162, 0, 0.05);
+  border-color: rgba(245, 162, 0, 0.3);
+}
+
+.auth-dataset-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.auth-dataset-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.auth-dataset-label {
+  display: block;
+  font-family: var(--ff-mono);
+  font-size: 0.6rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 3px;
+}
+
+.auth-dataset-box--stage3 .auth-dataset-label {
+  color: var(--orange);
+}
+
+.auth-dataset-desc {
+  color: var(--muted);
+  font-size: 0.83rem;
+  line-height: 1.4;
+}
+
+.auth-dataset-btn {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  background: linear-gradient(135deg, var(--cyan), var(--cyan-dim));
+  color: #000;
+  font-family: var(--ff-head);
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 8px 18px;
+  clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.auth-dataset-btn:hover {
+  box-shadow: var(--glow-c);
+  transform: translateY(-1px);
+}
+
+.auth-dataset-box--stage3 .auth-dataset-btn {
+  background: linear-gradient(135deg, var(--orange), var(--orange2));
+}
+
+/* Dataset not yet available — greyed out version */
+.auth-dataset-pending {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(95, 154, 184, 0.05);
+  border: 1px solid rgba(95, 154, 184, 0.18);
+  padding: 12px 16px;
+  margin-bottom: 4px;
+  opacity: 0.7;
+  font-size: 1.2rem;
+}
+.auth-dataset-pending .auth-dataset-label {
+  color: var(--muted);
+}
+
+/* Mobile stacking */
+@media (max-width: 480px) {
+  .auth-dataset-box {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .auth-dataset-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
