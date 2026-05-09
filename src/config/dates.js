@@ -16,14 +16,14 @@ export const DATES = {
   registrationClose: new Date("2026-04-08T11:59:59"),
 
   stage1Open:        new Date("2026-04-08T00:00:00"),
-  stage1Close:       new Date("2026-04-24T23:59:00"),  // noon deadline
+  stage1Close:       new Date("2026-04-24T23:59:00"),  
 
-  helpDeskSession:   new Date("2026-04-23T15:00:00"),  // 4th Apr, 3:00 pm
+  helpDeskSession:   new Date("2026-04-23T15:00:00"),  
   workshopDate:      new Date("2026-04-25T08:00:00"),  // 8am start
   top10Announce:     new Date("2026-05-04T00:00:00"),
 
-  stage3Open:        new Date("2026-05-09T13:00:00"),
-  stage3Close:       new Date("2026-05-09T18:30:00"),
+  stage3Open:        new Date("2026-05-10T09:00:00"),
+  stage3Close:       new Date("2026-05-10T13:30:00"),
 
   top5Announce:      new Date("2026-05-13T00:00:00"),
   presentations:     new Date("2026-05-17T00:00:00"),

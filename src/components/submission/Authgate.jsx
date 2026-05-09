@@ -7,7 +7,7 @@ import "./Authgate.css";
 
 // ✅ Set your Google Drive folder links here
 const STAGE1_DATASET_DRIVE_URL = "https://drive.google.com/drive/folders/14Z7UFQ438PP6i7y4w9vXtF83F7NQxSnH?usp=sharing";
-const STAGE3_DATASET_DRIVE_URL = "https://drive.google.com/drive/folders/14Z7UFQ438PP6i7y4w9vXtF83F7NQxSnH?usp=sharing";
+const STAGE3_DATASET_DRIVE_URL = "https://drive.google.com/drive/folders/1fTLfASeD1BTQGDSsf-L7xFawJepAeMWo?usp=sharing";
 
 export default function AuthGate({ onAuthenticated, stage }) {
   const [nic,     setNic]     = useState("");

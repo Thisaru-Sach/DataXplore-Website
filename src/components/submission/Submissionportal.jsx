@@ -1,30 +1,51 @@
 // src/components/submission/Submissionportal.jsx
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Link }                                      from "react-router-dom";
-import JSZip                                         from "jszip";
-import { DATES, fmt }                                from "../../config/dates";
-import {
-  uploadFile,
-  getExistingSubmission,
-} from "../../lib/supabase";
+import { Link } from "react-router-dom";
+import JSZip from "jszip";
+import { DATES, fmt } from "../../config/dates";
+import { uploadFile, getExistingSubmission } from "../../lib/supabase";
 import "./Submissionportal.css";
 
-const ACCEPTED_EXT     = [
-  ".pdf", ".csv", ".txt", ".json",                              
-  ".xls", ".xlsx", ".xlsm",                                     
-  ".R", ".r", ".rmd", ".Rmd", ".ipynb", ".py",                  
-  ".PBIX", ".PBIT", ".PBIW",                                    
-  ".TWB", ".TWBX", ".twb", ".TDS", ".TDE", ".HYPER",            
-  ".mtw", ".mtj", ".mwx", ".mpx",                               
-  ".sav", ".dta", ".sas7bdat",                                  
-  ".parquet", ".sqlite", ".db"                                  
+const ACCEPTED_EXT = [
+  ".pdf",
+  ".csv",
+  ".txt",
+  ".json",
+  ".xls",
+  ".xlsx",
+  ".xlsm",
+  ".R",
+  ".r",
+  ".rmd",
+  ".Rmd",
+  ".ipynb",
+  ".py",
+  ".PBIX",
+  ".PBIT",
+  ".PBIW",
+  ".TWB",
+  ".TWBX",
+  ".twb",
+  ".TDS",
+  ".TDE",
+  ".HYPER",
+  ".mtw",
+  ".mtj",
+  ".mwx",
+  ".mpx",
+  ".sav",
+  ".dta",
+  ".sas7bdat",
+  ".parquet",
+  ".sqlite",
+  ".db",
 ];
 const MAX_FILE_SIZE_MB = 50;
-const MAX_TOTAL_MB     = 50;
+const MAX_TOTAL_MB = 50;
 
 const STAGE_INFO = {
   1: {
-    label:    "Stage 1 - Data Analysis & Report",
+    label: "Stage 1 - Data Analysis & Report",
     deadline: `${fmt(DATES.stage1Close, "long")} before midnight`,
     instructions: [
       "Upload your analysis report as a PDF.",
@@ -36,10 +57,10 @@ const STAGE_INFO = {
     ],
   },
   3: {
-    label:    "Stage 3 - Dashboard Competition",
+    label: "Stage 3 - Dashboard Competition",
     // Stage 3 deadline pulled from dates.js
     deadline: fmt(DATES.stage3Close, "datetime"),
-    opensAt:  fmt(DATES.stage3Open,  "datetime"),
+    opensAt: fmt(DATES.stage3Open, "datetime"),
     instructions: [
       "Participants should submit a folder named using their team name.",
       "Submission folder should include:.",
@@ -53,17 +74,17 @@ const STAGE_INFO = {
 };
 
 export default function SubmissionPortal({ team, stage }) {
-  const [files,        setFiles]        = useState([]);
-  const [notes,        setNotes]        = useState("");
-  const [submitted,    setSubmitted]    = useState(false);
-  const [submitting,   setSubmitting]   = useState(false);
-  const [progress,     setProgress]     = useState("");
-  const [dragOver,     setDragOver]     = useState(false);
+  const [files, setFiles] = useState([]);
+  const [notes, setNotes] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [progress, setProgress] = useState("");
+  const [dragOver, setDragOver] = useState(false);
   const [uploadedMeta, setUploadedMeta] = useState(null);
-  const [existing,     setExisting]     = useState(null);
+  const [existing, setExisting] = useState(null);
   const [checkingPrev, setCheckingPrev] = useState(true);
 
-  const inputRef  = useRef(null);
+  const inputRef = useRef(null);
   const stageInfo = STAGE_INFO[stage] || STAGE_INFO[1];
 
   // Stage 3 eligibility — must have stage3_eligible = true
@@ -86,7 +107,7 @@ export default function SubmissionPortal({ team, stage }) {
 
   function validateFile(file) {
     const ext = "." + file.name.split(".").pop().toLowerCase();
-    if (!ACCEPTED_EXT.some(a => a.toLowerCase() === ext))
+    if (!ACCEPTED_EXT.some((a) => a.toLowerCase() === ext))
       return `File type "${ext}" is not accepted.`;
     if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024)
       return `File exceeds ${MAX_FILE_SIZE_MB} MB limit.`;
@@ -94,24 +115,38 @@ export default function SubmissionPortal({ team, stage }) {
   }
 
   const addFiles = useCallback((incoming) => {
-    const newEntries = Array.from(incoming).map(file => ({
-      file, id: crypto.randomUUID(), status: "pending", error: validateFile(file),
+    const newEntries = Array.from(incoming).map((file) => ({
+      file,
+      id: crypto.randomUUID(),
+      status: "pending",
+      error: validateFile(file),
     }));
-    setFiles(prev => [...prev, ...newEntries]);
+    setFiles((prev) => [...prev, ...newEntries]);
   }, []);
 
-  function removeFile(id) { setFiles(prev => prev.filter(f => f.id !== id)); }
+  function removeFile(id) {
+    setFiles((prev) => prev.filter((f) => f.id !== id));
+  }
 
-  const validFiles = files.filter(f => !f.error);
+  const validFiles = files.filter((f) => !f.error);
   const totalBytes = validFiles.reduce((s, f) => s + f.file.size, 0);
-  const totalMB    = (totalBytes / (1024 * 1024)).toFixed(1);
-  const tooLarge   = totalBytes > MAX_TOTAL_MB * 1024 * 1024;
-  const hasValid   = validFiles.length > 0 && !tooLarge;
-  const hasInvalid = files.some(f => f.error);
+  const totalMB = (totalBytes / (1024 * 1024)).toFixed(1);
+  const tooLarge = totalBytes > MAX_TOTAL_MB * 1024 * 1024;
+  const hasValid = validFiles.length > 0 && !tooLarge;
+  const hasInvalid = files.some((f) => f.error);
 
-  function onDrop(e)     { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files); }
-  function onDragOver(e) { e.preventDefault(); setDragOver(true); }
-  function onDragLeave() { setDragOver(false); }
+  function onDrop(e) {
+    e.preventDefault();
+    setDragOver(false);
+    if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files);
+  }
+  function onDragOver(e) {
+    e.preventDefault();
+    setDragOver(true);
+  }
+  function onDragLeave() {
+    setDragOver(false);
+  }
 
   async function handleSubmit() {
     if (!hasValid || submitting) return;
@@ -120,10 +155,10 @@ export default function SubmissionPortal({ team, stage }) {
     if (existing) {
       const confirmed = window.confirm(
         `You already have a submission for Stage ${stage}:\n` +
-        `"${existing.file_name}"\n` +
-        `Submitted: ${new Date(existing.submitted_at).toLocaleString("en-GB")}\n\n` +
-        `Proceeding will PERMANENTLY DELETE the previous submission\n` +
-        `and replace it with your new files.\n\nContinue?`
+          `"${existing.file_name}"\n` +
+          `Submitted: ${new Date(existing.submitted_at).toLocaleString("en-GB")}\n\n` +
+          `Proceeding will PERMANENTLY DELETE the previous submission\n` +
+          `and replace it with your new files.\n\nContinue?`,
       );
       if (!confirmed) return;
     }
@@ -132,34 +167,43 @@ export default function SubmissionPortal({ team, stage }) {
     try {
       // Step 1: Zip files
       setProgress("Compressing files…");
-      const zip    = new JSZip();
+      const zip = new JSZip();
       const folder = zip.folder(`${team.team_name}_stage${stage}`);
       for (const entry of validFiles) folder.file(entry.file.name, entry.file);
 
       const zipBlob = await zip.generateAsync(
-        { type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } },
-        ({ percent }) => setProgress(`Compressing… ${Math.round(percent)}%`)
+        {
+          type: "blob",
+          compression: "DEFLATE",
+          compressionOptions: { level: 6 },
+        },
+        ({ percent }) => setProgress(`Compressing… ${Math.round(percent)}%`),
       );
 
       const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-      const zipName   = `${team.team_name}_stage${stage}_${timestamp}.zip`;
-      const zipFile   = new File([zipBlob], zipName, { type: "application/zip" });
+      const zipName = `${team.team_name}_stage${stage}_${timestamp}.zip`;
+      const zipFile = new File([zipBlob], zipName, { type: "application/zip" });
 
       // Step 2: Upload — server handles deleting old file + DB row automatically
       // api/upload.js checks for existing submission, deletes storage file + DB row,
       // then saves the new file. No need to delete here.
       setProgress("Uploading to server…");
       const { record } = await uploadFile(
-        zipFile, stage, team.team_name, team.id, notes.trim() || null
+        zipFile,
+        stage,
+        team.team_name,
+        team.id,
+        notes.trim() || null,
       );
 
       setUploadedMeta(record);
       setExisting(record);
       setSubmitted(true);
-
     } catch (err) {
       setProgress("");
-      alert(`Upload failed: ${err.message}\n\nPlease try again or contact the organizers.`);
+      alert(
+        `Upload failed: ${err.message}\n\nPlease try again or contact the organizers.`,
+      );
     } finally {
       setSubmitting(false);
     }
@@ -177,7 +221,9 @@ export default function SubmissionPortal({ team, stage }) {
               ? "Only the Top 10 teams selected after Stage 1 can submit for Stage 3."
               : `Your team is not currently eligible to submit for Stage ${stage}.`}
           </p>
-          <Link to="/" className="btn-outline-sub">← Back to Home</Link>
+          <Link to="/" className="btn-outline-sub">
+            ← Back to Home
+          </Link>
         </div>
       </div>
     );
@@ -191,24 +237,38 @@ export default function SubmissionPortal({ team, stage }) {
           <div className="success-icon">✅</div>
           <h2 className="portal-title">Submission Received!</h2>
           <p className="portal-sub">
-            Your files for <strong>{stageInfo.label}</strong> have been
-            uploaded and saved successfully.
+            Your files for <strong>{stageInfo.label}</strong> have been uploaded
+            and saved successfully.
           </p>
           <div className="success-meta">
-            <div><span>Team</span><strong>{team.team_name}</strong></div>
-            <div><span>Stage</span><strong>{stage}</strong></div>
-            <div><span>Files zipped</span><strong>{validFiles.length} file(s)</strong></div>
+            <div>
+              <span>Team</span>
+              <strong>{team.team_name}</strong>
+            </div>
+            <div>
+              <span>Stage</span>
+              <strong>{stage}</strong>
+            </div>
+            <div>
+              <span>Files zipped</span>
+              <strong>{validFiles.length} file(s)</strong>
+            </div>
             {uploadedMeta && (
               <div>
                 <span>Submitted at</span>
-                <strong>{new Date(uploadedMeta.submitted_at).toLocaleString("en-GB")}</strong>
+                <strong>
+                  {new Date(uploadedMeta.submitted_at).toLocaleString("en-GB")}
+                </strong>
               </div>
             )}
           </div>
           <p className="portal-note">
-            Screenshot this page for your records. If you need to resubmit, log in again before the deadline.
+            Screenshot this page for your records. If you need to resubmit, log
+            in again before the deadline.
           </p>
-          <Link to="/" className="btn-outline-sub">← Back to Home</Link>
+          <Link to="/" className="btn-outline-sub">
+            ← Back to Home
+          </Link>
         </div>
       </div>
     );
@@ -218,7 +278,6 @@ export default function SubmissionPortal({ team, stage }) {
   return (
     <div className="portal-wrap">
       <div className="portal-card">
-
         {/* Header */}
         <div className="portal-header">
           <span className="portal-eyebrow">DataXplore 2.0</span>
@@ -250,11 +309,15 @@ export default function SubmissionPortal({ team, stage }) {
             <span className="portal-resubmit-icon">⚠️</span>
             <div>
               <strong>You have an existing Stage {stage} submission</strong>
-              <p>File: <code>{existing.file_name}</code><br />
-                Submitted: {new Date(existing.submitted_at).toLocaleString("en-GB")}</p>
               <p>
-                Uploading new files will <strong>permanently delete</strong> your
-                previous submission from the server and replace it.
+                File: <code>{existing.file_name}</code>
+                <br />
+                Submitted:{" "}
+                {new Date(existing.submitted_at).toLocaleString("en-GB")}
+              </p>
+              <p>
+                Uploading new files will <strong>permanently delete</strong>{" "}
+                your previous submission from the server and replace it.
               </p>
             </div>
           </div>
@@ -263,51 +326,87 @@ export default function SubmissionPortal({ team, stage }) {
         {/* Instructions */}
         <div className="portal-instructions">
           <p className="portal-instructions__head">Submission Guidelines</p>
-          <ul>{stageInfo.instructions.map((line, i) => <li key={i}>{line}</li>)}</ul>
+          <ul>
+            {stageInfo.instructions.map((line, i) => (
+              <li key={i}>{line}</li>
+            ))}
+          </ul>
         </div>
 
         {/* Drop zone */}
         <div
           className={`drop-zone ${dragOver ? "drop-zone--over" : ""}`}
-          onDrop={onDrop} onDragOver={onDragOver} onDragLeave={onDragLeave}
+          onDrop={onDrop}
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
           onClick={() => !submitting && inputRef.current?.click()}
-          role="button" tabIndex={0}
-          onKeyDown={e => e.key === "Enter" && !submitting && inputRef.current?.click()}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) =>
+            e.key === "Enter" && !submitting && inputRef.current?.click()
+          }
         >
-          <input ref={inputRef} type="file" multiple style={{ display:"none" }}
-            accept={ACCEPTED_EXT.join(",")} onChange={e => addFiles(e.target.files)}
-            disabled={submitting} />
+          <input
+            ref={inputRef}
+            type="file"
+            multiple
+            style={{ display: "none" }}
+            accept={ACCEPTED_EXT.join(",")}
+            onChange={(e) => addFiles(e.target.files)}
+            disabled={submitting}
+          />
           <div className="drop-zone__icon">📂</div>
           <p className="drop-zone__main">
-            {dragOver ? "Drop files here" : "Drag & drop files, or click to browse"}
+            {dragOver
+              ? "Drop files here"
+              : "Drag & drop files, or click to browse"}
           </p>
           <p className="drop-zone__sub">
-            Accepted: {ACCEPTED_EXT.join(", ")} · Max {MAX_FILE_SIZE_MB} MB per file
+            Accepted: {ACCEPTED_EXT.join(", ")} · Max {MAX_FILE_SIZE_MB} MB per
+            file
           </p>
-          <p className="drop-zone__sub">All files will be zipped automatically before upload.</p>
+          <p className="drop-zone__sub">
+            All files will be zipped automatically before upload.
+          </p>
         </div>
 
         {/* File list */}
         {files.length > 0 && (
           <>
             <ul className="file-list">
-              {files.map(entry => (
-                <li key={entry.id} className={`file-item file-item--${entry.error ? "error" : entry.status}`}>
+              {files.map((entry) => (
+                <li
+                  key={entry.id}
+                  className={`file-item file-item--${entry.error ? "error" : entry.status}`}
+                >
                   <span className="file-icon">{fileIcon(entry.file.name)}</span>
                   <div className="file-info">
                     <span className="file-name">{entry.file.name}</span>
-                    <span className="file-size">{formatSize(entry.file.size)}</span>
-                    {entry.error && <span className="file-error">{entry.error}</span>}
+                    <span className="file-size">
+                      {formatSize(entry.file.size)}
+                    </span>
+                    {entry.error && (
+                      <span className="file-error">{entry.error}</span>
+                    )}
                   </div>
                   <span className="file-status">{entry.error && "✕"}</span>
                   {!submitting && (
-                    <button className="file-remove" onClick={() => removeFile(entry.id)}>×</button>
+                    <button
+                      className="file-remove"
+                      onClick={() => removeFile(entry.id)}
+                    >
+                      ×
+                    </button>
                   )}
                 </li>
               ))}
             </ul>
-            <div className={`portal-size-bar ${tooLarge ? "portal-size-bar--over" : ""}`}>
-              <span>Total: <strong>{totalMB} MB</strong> / {MAX_TOTAL_MB} MB</span>
+            <div
+              className={`portal-size-bar ${tooLarge ? "portal-size-bar--over" : ""}`}
+            >
+              <span>
+                Total: <strong>{totalMB} MB</strong> / {MAX_TOTAL_MB} MB
+              </span>
               {tooLarge && <span className="size-warn">⚠ Exceeds limit</span>}
             </div>
           </>
@@ -315,13 +414,23 @@ export default function SubmissionPortal({ team, stage }) {
 
         {/* Notes */}
         <div className="portal-notes">
-          <label htmlFor="notes">Notes to Organizers <span>(optional)</span></label>
-          <textarea id="notes" rows={3} placeholder="Any notes about your submission…"
-            value={notes} onChange={e => setNotes(e.target.value)} disabled={submitting} />
+          <label htmlFor="notes">
+            Notes to Organizers <span>(optional)</span>
+          </label>
+          <textarea
+            id="notes"
+            rows={3}
+            placeholder="Any notes about your submission…"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            disabled={submitting}
+          />
         </div>
 
         {hasInvalid && (
-          <div className="portal-warning">⚠ Files with errors will be skipped.</div>
+          <div className="portal-warning">
+            ⚠ Files with errors will be skipped.
+          </div>
         )}
 
         {submitting && progress && (
@@ -336,25 +445,59 @@ export default function SubmissionPortal({ team, stage }) {
           disabled={!hasValid || submitting}
           onClick={handleSubmit}
         >
-          {submitting ? "Processing…" : existing
-            ? `Replace Previous & Submit ${validFiles.length} File(s) →`
-            : `Zip & Submit ${validFiles.length} File(s) →`}
+          {submitting
+            ? "Processing…"
+            : existing
+              ? `Replace Previous & Submit ${validFiles.length} File(s) →`
+              : `Zip & Submit ${validFiles.length} File(s) →`}
         </button>
 
-        <Link to="/" className="auth-back">← Back to Home</Link>
+        <Link to="/" className="auth-back">
+          ← Back to Home
+        </Link>
       </div>
     </div>
   );
 }
 
 function formatSize(bytes) {
-  if (bytes < 1024)         return bytes + " B";
-  if (bytes < 1024 * 1024)  return (bytes / 1024).toFixed(1) + " KB";
+  if (bytes < 1024) return bytes + " B";
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
   return (bytes / (1024 * 1024)).toFixed(1) + " MB";
 }
 
 function fileIcon(name) {
   const ext = name.split(".").pop().toLowerCase();
-  const map = { pdf:"📄", xlsx:"📊", xls:"📊", r:"📈", rmd:"📈", ipynb:"🐍", py:"🐍", csv:"📋", mtw:"📉", mtj:"📉" };
+  const map = {
+    pdf: "📄",
+    txt: "📄",
+    csv: "📋",
+    json: "{} ",
+    xlsx: "📊",
+    xls: "📊",
+    xlsm: "📊",
+    parquet: "📦",
+    r: "📈",
+    rmd: "📈",
+    ipynb: "🐍",
+    py: "🐍",
+    pbix: "🟡",
+    pbit: "🟡",
+    pbiw: "🌐",
+    twb: "🟦",
+    twbx: "🟦",
+    tds: "🔗",
+    tde: "💾",
+    hyper: "⚡",
+    mtw: "📉",
+    mtj: "📉",
+    mwx: "📉",
+    mpx: "📉",
+    sav: "💾",
+    dta: "💾",
+    sas7bdat: "💾",
+    sqlite: "🗄️",
+    db: "🗄️",
+  };
   return map[ext] || "📁";
 }
