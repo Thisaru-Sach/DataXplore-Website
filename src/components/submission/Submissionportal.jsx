@@ -9,7 +9,16 @@ import {
 } from "../../lib/supabase";
 import "./Submissionportal.css";
 
-const ACCEPTED_EXT     = [".pdf", ".xls", ".xlsx", ".R", ".r", ".rmd", ".Rmd", ".ipynb", ".py", ".csv", ".mtw", ".mtj", ".txt"];
+const ACCEPTED_EXT     = [
+  ".pdf", ".csv", ".txt", ".json",                              
+  ".xls", ".xlsx", ".xlsm",                                     
+  ".R", ".r", ".rmd", ".Rmd", ".ipynb", ".py",                  
+  ".PBIX", ".PBIT", ".PBIW",                                    
+  ".TWB", ".TWBX", ".twb", ".TDS", ".TDE", ".HYPER",            
+  ".mtw", ".mtj", ".mwx", ".mpx",                               
+  ".sav", ".dta", ".sas7bdat",                                  
+  ".parquet", ".sqlite", ".db"                                  
+];
 const MAX_FILE_SIZE_MB = 50;
 const MAX_TOTAL_MB     = 50;
 
@@ -34,11 +43,11 @@ const STAGE_INFO = {
     instructions: [
       "Participants should submit a folder named using their team name.",
       "Submission folder should include:.",
-      "1.All scripts and codes used to deveelop the dashboard.",
-      "2.The published dashboard link.",
+      "  1. All scripts and codes used to deveelop the dashboard.",
+      "  2. The published dashboard link.",
       "Participants have three and a half hours to build and publish their dashboard.",
       "You may use RShiny, power BI, Tableau, python to develop your dashboard.",
-      "Only one submission is allowed. Uzploading again replaces your previous file.",
+      "Only one submission is allowed. Uploading again replaces your previous file.",
     ],
   },
 };
