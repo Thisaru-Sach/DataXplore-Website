@@ -164,7 +164,7 @@ function Guidelines() {
               <li>
                 <span className="n">01</span>
                 <strong>Stage 3 (Physical):</strong> Dashboard competition held
-                at the <strong>BLC, Faculty of Applied Sciences, USJ</strong>.
+                at the <strong>FMSC New Building, USJ</strong>.
               </li>
               <li>
                 <span className="n">02</span>This is an{" "}
