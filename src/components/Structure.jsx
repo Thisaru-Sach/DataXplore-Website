@@ -206,8 +206,7 @@ function Structure() {
             <h3>Dashboard Competition & Final Presentation</h3>
             <ul>
               <li>
-                <strong>Physical round</strong> at the Blended Learning Center
-                (BLC), USJ.
+                <strong>Physical round</strong> at the FMSC New Building, USJ.
               </li>
               <li>
                 Transform a new dataset into an{" "}
