@@ -98,7 +98,7 @@ function ClosedScreen({ phase }) {
       icon:    "🏁",
       title:   "All Submissions Closed",
       body:    "The submission portal has closed. Thank you to all participating teams!",
-      sub:     `Winners will be announced on ${DATES.winnersAnnounce.toDateString()}.`,
+      sub:     `Winners will be announced on ${DATES.top5Announce.toDateString()}.`,
     },
   };
 
