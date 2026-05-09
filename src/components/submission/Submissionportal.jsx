@@ -9,13 +9,22 @@ import {
 } from "../../lib/supabase";
 import "./Submissionportal.css";
 
-const ACCEPTED_EXT     = [".pdf", ".xls", ".xlsx", ".R", ".r", ".rmd", ".Rmd", ".ipynb", ".py", ".csv", ".mtw", ".mtj", ".txt"];
+const ACCEPTED_EXT     = [
+  ".pdf", ".csv", ".txt", ".json",                              
+  ".xls", ".xlsx", ".xlsm",                                     
+  ".R", ".r", ".rmd", ".Rmd", ".ipynb", ".py",                  
+  ".PBIX", ".PBIT", ".PBIW",                                    
+  ".TWB", ".TWBX", ".twb", ".TDS", ".TDE", ".HYPER",            
+  ".mtw", ".mtj", ".mwx", ".mpx",                               
+  ".sav", ".dta", ".sas7bdat",                                  
+  ".parquet", ".sqlite", ".db"                                  
+];
 const MAX_FILE_SIZE_MB = 50;
 const MAX_TOTAL_MB     = 50;
 
 const STAGE_INFO = {
   1: {
-    label:    "Stage 1 — Data Analysis & Report",
+    label:    "Stage 1 - Data Analysis & Report",
     deadline: `${fmt(DATES.stage1Close, "long")} before midnight`,
     instructions: [
       "Upload your analysis report as a PDF.",
@@ -27,18 +36,18 @@ const STAGE_INFO = {
     ],
   },
   3: {
-    label:    "Stage 3 — Dashboard Competition",
+    label:    "Stage 3 - Dashboard Competition",
     // Stage 3 deadline pulled from dates.js
     deadline: fmt(DATES.stage3Close, "datetime"),
     opensAt:  fmt(DATES.stage3Open,  "datetime"),
     instructions: [
-      "Upload your final full report as a PDF.",
-      "Include your dashboard file or a PDF export of the dashboard.",
-      "Include your R Markdown / R Script or Jupyter Notebook.",
-      "Do NOT include your university name or personal info in the files.",
-      "Only include your Team Name.",
-      "All files will be zipped automatically before upload.",
-      "Only one submission is allowed. Uzploading again replaces your previous file.",
+      "Participants should submit a folder named using their team name.",
+      "Submission folder should include:.",
+      "  1. All scripts and codes used to deveelop the dashboard.",
+      "  2. The published dashboard link.",
+      "Participants have three and a half hours to build and publish their dashboard.",
+      "You may use RShiny, power BI, Tableau, python to develop your dashboard.",
+      "Only one submission is allowed. Uploading again replaces your previous file.",
     ],
   },
 };
