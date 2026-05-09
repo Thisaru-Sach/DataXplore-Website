@@ -24,7 +24,7 @@ const MAX_TOTAL_MB     = 50;
 
 const STAGE_INFO = {
   1: {
-    label:    "Stage 1 — Data Analysis & Report",
+    label:    "Stage 1 - Data Analysis & Report",
     deadline: `${fmt(DATES.stage1Close, "long")} before midnight`,
     instructions: [
       "Upload your analysis report as a PDF.",
@@ -36,7 +36,7 @@ const STAGE_INFO = {
     ],
   },
   3: {
-    label:    "Stage 3 — Dashboard Competition",
+    label:    "Stage 3 - Dashboard Competition",
     // Stage 3 deadline pulled from dates.js
     deadline: fmt(DATES.stage3Close, "datetime"),
     opensAt:  fmt(DATES.stage3Open,  "datetime"),
