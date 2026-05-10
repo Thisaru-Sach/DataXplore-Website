@@ -499,6 +499,7 @@ function fileIcon(name) {
     sas7bdat: "💾",
     sqlite: "🗄️",
     db: "🗄️",
+    zip: "🗄️",
   };
   return map[ext] || "📁";
 }
