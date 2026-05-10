@@ -39,6 +39,7 @@ const ACCEPTED_EXT = [
   ".parquet",
   ".sqlite",
   ".db",
+  ".zip",
 ];
 const MAX_FILE_SIZE_MB = 50;
 const MAX_TOTAL_MB = 50;
