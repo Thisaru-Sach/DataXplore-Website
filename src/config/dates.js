@@ -23,7 +23,7 @@ export const DATES = {
   top10Announce:     new Date("2026-05-04T00:00:00"),
 
   stage3Open:        new Date("2026-05-10T09:00:00"),
-  stage3Close:       new Date("2026-05-10T13:30:00"),
+  stage3Close:       new Date("2026-05-10T13:40:00"),
 
   top5Announce:      new Date("2026-05-13T00:00:00"),
   presentations:     new Date("2026-05-17T00:00:00"),
