@@ -1,14 +1,7 @@
 // src/lib/adminsupabase.js
-// ─────────────────────────────────────────────────────────
-//  Admin data access — all calls go through /api/admin.
-//  The service key and admin password never reach the browser.
-//
-//  The admin password is sent with every request so the
-//  server can re-validate it — sessionStorage only stores
-//  it for UX (pre-filling), the server is the real gate.
-// ─────────────────────────────────────────────────────────
+// All admin calls go through /api/admin serverless function.
+// Service key and admin password stay server-side only.
 
-// Get password from sessionStorage (set by AdminRoot on login)
 function getPass() {
   return sessionStorage.getItem("admin_password") ?? "";
 }
@@ -28,8 +21,6 @@ async function api(action, payload = {}) {
   if (!res.ok) throw new Error(json.error || "Admin API error");
   return json;
 }
-
-// ── Public API ─────────────────────────────────────────────
 
 export async function getAllTeams() {
   const { data } = await api("get_teams");
@@ -51,8 +42,11 @@ export async function getTeamSubmissions(teamId) {
   return data ?? [];
 }
 
-export async function setEligibility(teamId, stage, value) {
-  await api("set_eligibility", { teamId, stage, value });
+// ── Updated: pass the field name directly ─────────────────
+// field: "stage1_eligible" | "stage3_eligible"
+//      | "top5_eligible"   | "presentation_eligible"
+export async function setEligibility(teamId, field, value) {
+  await api("set_eligibility", { teamId, field, value });
 }
 
 export async function deleteSubmission(submissionId, filePath) {

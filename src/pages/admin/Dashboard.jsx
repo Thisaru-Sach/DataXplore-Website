@@ -11,11 +11,9 @@ const EMPTY = {
   nic_number: "", student_id_url: "",
   email: "", contact_number: "", academic_year: "",
   team_name: "", member_count: "3",
-  member1: "",
-  member2: "",
-  member3: "",
-  member4: "",
-  stage1_eligible: true, stage3_eligible: false,
+  member1: "", member2: "", member3: "", member4: "",
+  stage1_eligible: true,  stage3_eligible: false,
+  top5_eligible:   false, presentation_eligible: false,
 };
 
 export default function Dashboard() {
@@ -37,8 +35,10 @@ export default function Dashboard() {
 
   useEffect(() => { load(); }, []);
 
-  async function toggleEligible(teamId, stage, current) {
-    try   { await setEligibility(teamId, stage, !current); await load(); }
+  // ── Generic eligibility toggle ─────────────────────────
+  // field: "stage3_eligible" | "top5_eligible" | "presentation_eligible"
+  async function toggle(teamId, field, current) {
+    try   { await setEligibility(teamId, field, !current); await load(); }
     catch (e) { alert(e.message); }
   }
 
@@ -84,14 +84,13 @@ export default function Dashboard() {
         member2: form.member2.trim() || null,
         member3: form.member3.trim() || null,
         member4: parseInt(form.member_count) === 4 ? (form.member4.trim() || null) : null,
-        stage1_eligible: form.stage1_eligible,
-        stage3_eligible: form.stage3_eligible,
+        stage1_eligible:        form.stage1_eligible,
+        stage3_eligible:        form.stage3_eligible,
+        top5_eligible:          form.top5_eligible,
+        presentation_eligible:  form.presentation_eligible,
       };
 
-      // ✅ FIX: insertTeam is a plain async function — call it directly
-      // Do NOT use insertTeam.from(...) — that was the old Supabase client syntax
       await insertTeam(payload);
-
       setShowAdd(false);
       setForm(EMPTY);
       await load();
@@ -137,7 +136,15 @@ export default function Dashboard() {
         </div>
         <div className="adm-stat">
           <span className="adm-stat-val">{teams.filter(t => t.stage3_eligible).length}</span>
-          <span className="adm-stat-lbl">Stage 3 Eligible</span>
+          <span className="adm-stat-lbl">Top 10</span>
+        </div>
+        <div className="adm-stat">
+          <span className="adm-stat-val">{teams.filter(t => t.top5_eligible).length}</span>
+          <span className="adm-stat-lbl">Top 5</span>
+        </div>
+        <div className="adm-stat">
+          <span className="adm-stat-val">{teams.filter(t => t.presentation_eligible).length}</span>
+          <span className="adm-stat-lbl">Presenters</span>
         </div>
         <div className="adm-stat">
           <span className="adm-stat-val">{teams.filter(t => t.stage3_files > 0).length}</span>
@@ -157,12 +164,12 @@ export default function Dashboard() {
                 <th>Team Name</th>
                 <th>Lead Registrant</th>
                 <th>University</th>
-                <th>Faculty</th>
-                <th>Email</th>
-                <th>Members</th>
                 <th>S1 Files</th>
                 <th>S3 Files</th>
-                <th>S3 Eligible</th>
+                {/* ── Four eligibility columns ── */}
+                <th title="Top 10 — can submit Stage 3">S3 Eligible</th>
+                <th title="Top 5 — revealed on top5Announce date">Top 5</th>
+                <th title="Presenter — revealed on presentations date">Presenter</th>
                 <th>Last Submit</th>
                 <th>Details</th>
               </tr>
@@ -177,9 +184,6 @@ export default function Dashboard() {
                     {t.preferred_name && <span className="adm-preferred"> ({t.preferred_name})</span>}
                   </td>
                   <td>{t.university}</td>
-                  <td>{t.faculty || "—"}</td>
-                  <td className="adm-mono adm-small">{t.email}</td>
-                  <td style={{ textAlign: "center" }}>{t.member_count}</td>
                   <td>
                     <span className={`adm-badge ${t.stage1_files > 0 ? "adm-badge--green" : "adm-badge--grey"}`}>
                       {t.stage1_files > 0 ? `✓ ${t.stage1_files}` : "—"}
@@ -190,14 +194,42 @@ export default function Dashboard() {
                       {t.stage3_files > 0 ? `✓ ${t.stage3_files}` : "—"}
                     </span>
                   </td>
+
+                  {/* Stage 3 eligible toggle */}
                   <td>
                     <button
                       className={`adm-toggle ${t.stage3_eligible ? "adm-toggle--on" : ""}`}
-                      onClick={() => toggleEligible(t.id, 3, t.stage3_eligible)}
+                      onClick={() => toggle(t.id, "stage3_eligible", t.stage3_eligible)}
+                      title="Toggle Stage 3 (Top 10) eligibility"
                     >
-                      {t.stage3_eligible ? "✓ Yes" : "No"}
+                      {t.stage3_eligible ? "✓" : "—"}
                     </button>
                   </td>
+
+                  {/* Top 5 eligible toggle */}
+                  <td>
+                    <button
+                      className={`adm-toggle ${t.top5_eligible ? "adm-toggle--orange" : ""}`}
+                      onClick={() => toggle(t.id, "top5_eligible", t.top5_eligible)}
+                      title="Toggle Top 5 eligibility"
+                      disabled={!t.stage3_eligible}
+                    >
+                      {t.top5_eligible ? "🏆" : "—"}
+                    </button>
+                  </td>
+
+                  {/* Presentation eligible toggle */}
+                  <td>
+                    <button
+                      className={`adm-toggle ${t.presentation_eligible ? "adm-toggle--cyan" : ""}`}
+                      onClick={() => toggle(t.id, "presentation_eligible", t.presentation_eligible)}
+                      title="Toggle Presentation eligibility"
+                      disabled={!t.top5_eligible}
+                    >
+                      {t.presentation_eligible ? "🎤" : "—"}
+                    </button>
+                  </td>
+
                   <td className="adm-mono adm-small">
                     {t.last_submission
                       ? new Date(t.last_submission).toLocaleDateString("en-GB")
@@ -209,7 +241,7 @@ export default function Dashboard() {
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={12} className="adm-empty">No teams found.</td></tr>
+                <tr><td colSpan={11} className="adm-empty">No teams found.</td></tr>
               )}
             </tbody>
           </table>
@@ -290,12 +322,8 @@ export default function Dashboard() {
                   <div key={n} className="adm-form-row">
                     <label>
                       Member {n} <span className="req">*</span>
-                      <input
-                        name={`member${n}`}
-                        value={form[`member${n}`]}
-                        onChange={onChange}
-                        placeholder="Full Name — +94 71 XXX XXXX"
-                      />
+                      <input name={`member${n}`} value={form[`member${n}`]} onChange={onChange}
+                        placeholder="Full Name — +94 71 XXX XXXX" />
                     </label>
                   </div>
                 ))}
@@ -303,18 +331,14 @@ export default function Dashboard() {
                   <div className="adm-form-row">
                     <label>
                       Member 4 <span className="req">*</span>
-                      <input
-                        name="member4"
-                        value={form.member4}
-                        onChange={onChange}
-                        placeholder="Full Name — +94 71 XXX XXXX"
-                      />
+                      <input name="member4" value={form.member4} onChange={onChange}
+                        placeholder="Full Name — +94 71 XXX XXXX" />
                     </label>
                   </div>
                 )}
               </div>
 
-              {/* Eligibility */}
+              {/* Eligibility — all four flags */}
               <div className="adm-form-section">
                 <div className="adm-form-section-title">Competition Access</div>
                 <div className="adm-form-row adm-form-checkrow">
@@ -324,7 +348,15 @@ export default function Dashboard() {
                   </label>
                   <label className="adm-check-label">
                     <input type="checkbox" name="stage3_eligible" checked={form.stage3_eligible} onChange={onChange} />
-                    Stage 3 Eligible
+                    Stage 3 Eligible (Top 10)
+                  </label>
+                  <label className="adm-check-label">
+                    <input type="checkbox" name="top5_eligible" checked={form.top5_eligible} onChange={onChange} />
+                    Top 5 Finalist
+                  </label>
+                  <label className="adm-check-label">
+                    <input type="checkbox" name="presentation_eligible" checked={form.presentation_eligible} onChange={onChange} />
+                    Presentation Eligible
                   </label>
                 </div>
               </div>

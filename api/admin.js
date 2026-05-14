@@ -15,7 +15,6 @@ export default async function handler(req, res) {
 
   const { password, action, payload } = req.body ?? {};
 
-  // ── Env var check — helps diagnose missing variables ──
   if (!SUPABASE_URL || !SUPABASE_SERVICE || !ADMIN_PASSWORD) {
     console.error("Missing env vars:", {
       hasUrl:      !!SUPABASE_URL,
@@ -25,7 +24,6 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Server misconfiguration — missing environment variables" });
   }
 
-  // ── Password check ─────────────────────────────────────
   if (!password || password !== ADMIN_PASSWORD) {
     return res.status(401).json({ error: "Unauthorized" });
   }
@@ -41,10 +39,7 @@ export default async function handler(req, res) {
         const { data, error } = await supabase
           .from("admin_submission_overview")
           .select("*");
-        if (error) {
-          console.error("get_teams error:", error);
-          throw error;
-        }
+        if (error) { console.error("get_teams error:", error); throw error; }
         return res.status(200).json({ data });
       }
 
@@ -79,11 +74,22 @@ export default async function handler(req, res) {
         return res.status(200).json({ data });
       }
 
+      // ── Updated: supports all four eligibility fields ──────
+      // payload.field: "stage1_eligible" | "stage3_eligible"
+      //              | "top5_eligible"   | "presentation_eligible"
       case "set_eligibility": {
-        const field = payload.stage === 3 ? "stage3_eligible" : "stage1_eligible";
+        const ALLOWED_FIELDS = [
+          "stage1_eligible",
+          "stage3_eligible",
+          "top5_eligible",
+          "presentation_eligible",
+        ];
+        if (!ALLOWED_FIELDS.includes(payload.field)) {
+          return res.status(400).json({ error: `Invalid field: ${payload.field}` });
+        }
         const { error } = await supabase
           .from("teams")
-          .update({ [field]: payload.value })
+          .update({ [payload.field]: payload.value })
           .eq("id", payload.teamId);
         if (error) { console.error("set_eligibility error:", error); throw error; }
         return res.status(200).json({ ok: true });

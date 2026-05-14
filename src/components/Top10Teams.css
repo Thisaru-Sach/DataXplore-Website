@@ -1,16 +1,46 @@
 /* src/components/Top10Teams.css */
 
-/* Intro paragraph */
+/* ── Intro paragraph ─────────────────────────────────── */
 .top10-intro {
   color: var(--muted);
   font-size: 1rem;
   line-height: 1.65;
   max-width: 620px;
-  margin-bottom: 40px;
+  margin-bottom: 28px;
   margin-top: -24px;
 }
 
-/* Loading state */
+/* ── Phase indicator pills ───────────────────────────── */
+.top10-phases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+
+.top10-phase-pill {
+  font-family: var(--ff-mono);
+  font-size: 0.62rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+
+.top10-phase-pill--done {
+  background: rgba(63, 185, 80, 0.12);
+  color: #40d080;
+  border: 1px solid rgba(63, 185, 80, 0.28);
+}
+
+.top10-phase-pill--upcoming {
+  background: rgba(95, 154, 184, 0.08);
+  color: var(--muted);
+  border: 1px solid rgba(95, 154, 184, 0.2);
+}
+
+/* ── Loading state ───────────────────────────────────── */
 .top10-loading {
   display: flex;
   align-items: center;
@@ -30,21 +60,21 @@
 }
 @keyframes top10spin { to { transform: rotate(360deg); } }
 
-/* Empty state */
+/* ── Empty state ─────────────────────────────────────── */
 .top10-empty {
   color: var(--muted);
   font-style: italic;
   font-size: 0.95rem;
 }
 
-/* Grid of team cards */
+/* ── Grid ────────────────────────────────────────────── */
 .top10-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
 }
 
-/* Individual team card */
+/* ── Base card ───────────────────────────────────────── */
 .top10-card {
   display: flex;
   align-items: center;
@@ -54,28 +84,54 @@
   padding: 18px 20px;
   position: relative;
   transition: border-color 0.25s, box-shadow 0.25s, transform 0.2s;
-  /* angular clip same as the site's button style */
   clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
 }
-
 .top10-card:hover {
   border-color: var(--cyan);
   box-shadow: var(--glow-c);
   transform: translateY(-2px);
 }
 
-/* Rank number */
-.top10-rank {
-  font-family: var(--ff-mono);
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: var(--orange);
-  flex-shrink: 0;
-  line-height: 1;
-  min-width: 32px;
+/* ── Top 5 card variant ──────────────────────────────── */
+.top10-card--top5 {
+  border-color: rgba(245, 162, 0, 0.45);
+  background: rgba(10, 24, 45, 0.88);
+}
+.top10-card--top5:hover {
+  border-color: var(--orange);
+  box-shadow: var(--glow-o);
+}
+/* Subtle left accent line for top5 */
+.top10-card--top5::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--orange), var(--orange2));
 }
 
-/* Team name + university */
+/* ── Presenter card variant ──────────────────────────── */
+.top10-card--presenter {
+  border-color: rgba(0, 200, 240, 0.5);
+  background: rgba(0, 30, 55, 0.92);
+}
+.top10-card--presenter:hover {
+  border-color: var(--cyan);
+  box-shadow: var(--glow-c);
+}
+.top10-card--presenter::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--cyan), var(--cyan-dim));
+}
+
+/* ── Team info ───────────────────────────────────────── */
 .top10-info {
   flex: 1;
   min-width: 0;
@@ -104,42 +160,71 @@
   text-overflow: ellipsis;
 }
 
-/* Advanced badge */
+/* ── Badges ──────────────────────────────────────────── */
 .top10-badge {
   font-family: var(--ff-mono);
   font-size: 0.58rem;
   letter-spacing: 1.5px;
   text-transform: uppercase;
-  color: #40d080;
-  background: rgba(63, 185, 80, 0.1);
-  border: 1px solid rgba(63, 185, 80, 0.28);
   padding: 3px 8px;
   flex-shrink: 0;
   white-space: nowrap;
 }
 
-/* Bypass mode note */
+/* Phase 1 — Advanced */
+.top10-badge--advanced {
+  color: #40d080;
+  background: rgba(63, 185, 80, 0.1);
+  border: 1px solid rgba(63, 185, 80, 0.28);
+}
+
+/* Phase 2 — Top 5 Finalist */
+.top10-badge--top5 {
+  color: var(--orange);
+  background: rgba(245, 162, 0, 0.1);
+  border: 1px solid rgba(245, 162, 0, 0.35);
+  font-size: 0.62rem;
+}
+
+/* Phase 3 — Presenter */
+.top10-badge--presenter {
+  color: var(--cyan);
+  background: rgba(0, 200, 240, 0.1);
+  border: 1px solid rgba(0, 200, 240, 0.3);
+  font-size: 0.62rem;
+}
+
+/* ── Bypass note ─────────────────────────────────────── */
 .top10-bypass-note {
   margin-top: 24px;
   font-family: var(--ff-mono);
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   color: #f0c040;
   letter-spacing: 1px;
   opacity: 0.75;
+  line-height: 1.8;
 }
 
-/* ── Responsive ────────────────────────────────────────── */
+/* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 600px) {
   .top10-grid {
     grid-template-columns: 1fr;
   }
-
   .top10-card {
-    clip-path: none;  /* clip-path looks odd on very narrow cards */
-    border-left: 3px solid var(--orange);
+    clip-path: none;
   }
-
-  .top10-badge {
-    display: none;   /* hide on very small screens to save space */
+  /* Keep the left border visible on mobile instead of clip-path */
+  .top10-card--top5,
+  .top10-card--presenter {
+    clip-path: none;
+    border-left-width: 3px;
+  }
+  .top10-badge--top5,
+  .top10-badge--presenter {
+    font-size: 0.55rem;
+  }
+  .top10-phases {
+    flex-direction: column;
+    gap: 6px;
   }
 }
