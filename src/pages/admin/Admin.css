@@ -667,3 +667,54 @@
   .adm-modal { max-height: 100vh; }
   .adm-team-form { max-height: 80vh; }
 }
+
+/* ── Append these to the bottom of Admin.css ─────────────── */
+
+/* Orange toggle — used for Top 5 */
+.adm-toggle--orange {
+  border-color: var(--adm-orange);
+  color: var(--adm-orange);
+}
+.adm-toggle--orange:hover {
+  border-color: var(--adm-orange);
+  color: var(--adm-orange);
+  background: rgba(247, 129, 102, 0.08);
+}
+
+/* Cyan toggle — used for Presentation */
+.adm-toggle--cyan {
+  border-color: var(--adm-cyan);
+  color: var(--adm-cyan);
+}
+.adm-toggle--cyan:hover {
+  border-color: var(--adm-cyan);
+  color: var(--adm-cyan);
+  background: rgba(88, 166, 255, 0.08);
+}
+
+/* Disabled toggle */
+.adm-toggle:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  border-color: var(--adm-border);
+  color: var(--adm-muted);
+}
+
+/* Eligibility row — value + button side by side */
+.adm-elig-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+/* Hint text under disabled buttons */
+.adm-elig-hint {
+  font-size: 0.65rem;
+  color: var(--adm-muted);
+  margin-top: 5px;
+  font-style: italic;
+}
+
+/* Extra stat cards for new columns */
+/* (the existing .adm-stat styles handle this — no extra CSS needed) */

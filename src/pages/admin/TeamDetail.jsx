@@ -31,8 +31,9 @@ export default function TeamDetail() {
     } catch (e) { alert(e.message); }
   }
 
-  async function toggleEligible(stage, current) {
-    try { await setEligibility(id, stage, !current); await load(); }
+  // Generic toggle — field: any of the four eligibility columns
+  async function toggle(field, current) {
+    try { await setEligibility(id, field, !current); await load(); }
     catch (e) { alert(e.message); }
   }
 
@@ -40,8 +41,6 @@ export default function TeamDetail() {
   if (error)   return <div className="adm-error">⚠ {error}</div>;
   if (!team)   return <div className="adm-error">Team not found.</div>;
 
-  // ✅ FIX: schema columns are member1/member2/member3/member4 (single text field each)
-  // Not member1_name / member1_contact — those don't exist
   const members = [1, 2, 3, 4]
     .filter(n => team[`member${n}`])
     .map(n => ({ n, value: team[`member${n}`] }));
@@ -138,8 +137,6 @@ export default function TeamDetail() {
       {/* Team members */}
       <section className="adm-detail-section">
         <h3 className="adm-section-title">Team Members ({members.length})</h3>
-        {/* ✅ FIX: each member is a single text field "Name — contact"
-            Display it as-is — no separate name/contact sub-fields */}
         <div className="adm-members-grid">
           {members.map(m => (
             <div key={m.n} className="adm-member-card">
@@ -150,30 +147,83 @@ export default function TeamDetail() {
         </div>
       </section>
 
-      {/* Competition eligibility */}
+      {/* ── Competition eligibility — all four fields ────── */}
       <section className="adm-detail-section">
         <h3 className="adm-section-title">Competition Access</h3>
         <div className="adm-detail-grid">
+
+          {/* Stage 1 */}
           <div className="adm-detail-card">
             <label>Stage 1 Eligible</label>
-            <strong>{team.stage1_eligible ? "✅ Yes" : "❌ No"}</strong>
+            <div className="adm-elig-row">
+              <strong>{team.stage1_eligible ? "✅ Yes" : "❌ No"}</strong>
+              <button
+                className={`adm-toggle ${team.stage1_eligible ? "adm-toggle--on" : ""}`}
+                onClick={() => toggle("stage1_eligible", team.stage1_eligible)}
+              >
+                {team.stage1_eligible ? "Revoke" : "Grant"}
+              </button>
+            </div>
           </div>
+
+          {/* Stage 3 / Top 10 */}
           <div className="adm-detail-card">
-            <label>Stage 3 Eligible</label>
-            <div style={{ display:"flex", gap:10, alignItems:"center" }}>
+            <label>Stage 3 Eligible (Top 10)</label>
+            <div className="adm-elig-row">
               <strong>{team.stage3_eligible ? "✅ Yes" : "❌ No"}</strong>
               <button
-                className={"adm-toggle " + (team.stage3_eligible ? "adm-toggle--on" : "")}
-                onClick={() => toggleEligible(3, team.stage3_eligible)}
+                className={`adm-toggle ${team.stage3_eligible ? "adm-toggle--on" : ""}`}
+                onClick={() => toggle("stage3_eligible", team.stage3_eligible)}
               >
                 {team.stage3_eligible ? "Revoke" : "Grant"}
               </button>
             </div>
           </div>
+
+          {/* Top 5 */}
+          <div className="adm-detail-card">
+            <label>Top 5 Finalist</label>
+            <div className="adm-elig-row">
+              <strong>{team.top5_eligible ? "🏆 Yes" : "❌ No"}</strong>
+              <button
+                className={`adm-toggle ${team.top5_eligible ? "adm-toggle--orange" : ""}`}
+                onClick={() => toggle("top5_eligible", team.top5_eligible)}
+                disabled={!team.stage3_eligible}
+                title={!team.stage3_eligible ? "Must be Stage 3 eligible first" : ""}
+              >
+                {team.top5_eligible ? "Revoke" : "Grant"}
+              </button>
+            </div>
+            {!team.stage3_eligible && (
+              <p className="adm-elig-hint">Requires Stage 3 eligibility</p>
+            )}
+          </div>
+
+          {/* Presentation eligible */}
+          <div className="adm-detail-card">
+            <label>Presentation Eligible</label>
+            <div className="adm-elig-row">
+              <strong>{team.presentation_eligible ? "🎤 Yes" : "❌ No"}</strong>
+              <button
+                className={`adm-toggle ${team.presentation_eligible ? "adm-toggle--cyan" : ""}`}
+                onClick={() => toggle("presentation_eligible", team.presentation_eligible)}
+                disabled={!team.top5_eligible}
+                title={!team.top5_eligible ? "Must be Top 5 eligible first" : ""}
+              >
+                {team.presentation_eligible ? "Revoke" : "Grant"}
+              </button>
+            </div>
+            {!team.top5_eligible && (
+              <p className="adm-elig-hint">Requires Top 5 eligibility</p>
+            )}
+          </div>
+
+          {/* Record added */}
           <div className="adm-detail-card">
             <label>Record Added</label>
             <strong>{new Date(team.created_at).toLocaleDateString("en-GB")}</strong>
           </div>
+
         </div>
       </section>
 
@@ -187,20 +237,32 @@ export default function TeamDetail() {
             <table className="adm-table">
               <thead>
                 <tr>
-                  <th>Stage</th><th>File</th><th>Size</th>
-                  <th>Submitted</th><th>Notes</th><th>Download</th>
+                  <th>Stage</th>
+                  <th>File</th>
+                  <th>Size</th>
+                  <th>Submitted</th>
+                  <th>Notes</th>
+                  <th>Download</th>
                 </tr>
               </thead>
               <tbody>
                 {subs.map(s => (
                   <tr key={s.id}>
-                    <td><span className={"adm-badge adm-badge--s" + s.stage}>Stage {s.stage}</span></td>
+                    <td>
+                      <span className={"adm-badge adm-badge--s" + s.stage}>
+                        Stage {s.stage}
+                      </span>
+                    </td>
                     <td className="adm-mono adm-small">{s.file_name}</td>
                     <td className="adm-mono adm-small">{fmtSize(s.file_size_bytes)}</td>
-                    <td className="adm-mono adm-small">{new Date(s.submitted_at).toLocaleString("en-GB")}</td>
+                    <td className="adm-mono adm-small">
+                      {new Date(s.submitted_at).toLocaleString("en-GB")}
+                    </td>
                     <td>{s.notes || "—"}</td>
                     <td>
-                      <button className="adm-dl-btn" onClick={() => download(s)}>⬇ Download</button>
+                      <button className="adm-dl-btn" onClick={() => download(s)}>
+                        ⬇ Download
+                      </button>
                     </td>
                   </tr>
                 ))}
