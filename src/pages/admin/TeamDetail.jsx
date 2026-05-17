@@ -201,9 +201,9 @@ export default function TeamDetail() {
 
           {/* Presentation eligible */}
           <div className="adm-detail-card">
-            <label>Presentation Eligible</label>
+            <label>Top 3 Finalist</label>
             <div className="adm-elig-row">
-              <strong>{team.presentation_eligible ? "🎤 Yes" : "❌ No"}</strong>
+              <strong>{team.presentation_eligible ? "🏆 Yes" : "❌ No"}</strong>
               <button
                 className={`adm-toggle ${team.presentation_eligible ? "adm-toggle--cyan" : ""}`}
                 onClick={() => toggle("presentation_eligible", team.presentation_eligible)}

@@ -29,7 +29,7 @@ export default function Top10Teams() {
   // ── Which phase are we in? ─────────────────────────────
   const showSection      = BYPASS_DATE_CHECK || now >= DATES.top10Announce;
   const showTop5         = BYPASS_DATE_CHECK || now >= DATES.top5Announce;
-  const showPresentations = BYPASS_DATE_CHECK || now >= DATES.presentations;
+  const showPresentations = BYPASS_DATE_CHECK || now >= DATES.winnersAnnounce;
 
   useEffect(() => {
     if (!showSection) { setLoading(false); return; }
