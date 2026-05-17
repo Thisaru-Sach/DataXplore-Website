@@ -58,9 +58,9 @@ export default function Top10Teams() {
   let sectionIntro   = "Congratulations to the following teams who have been selected to advance to the Dashboard Competition (Stage 3).";
 
   if (showPresentations) {
-    sectionEyebrow = "Final Presentations";
-    sectionTitle   = <h2 className="sec-title">Final <span>Presenters</span></h2>;
-    sectionIntro   = "The following teams will present to the judges at the Final Presentation round.";
+    sectionEyebrow = "Top 3 Finalists";
+    sectionTitle   = <h2 className="sec-title">Top 3 <span>Finalists</span></h2>;
+    sectionIntro   = "The Top 3 teams have been selected from the presentations. Congratulations!";
   } else if (showTop5) {
     sectionEyebrow = "Top 5 Finalists";
     sectionTitle   = <h2 className="sec-title">Top 5 <span>Finalists</span></h2>;
@@ -123,7 +123,7 @@ export default function Top10Teams() {
             {showTop5 ? "✓" : "⏳"} Top 5 - {fmt(DATES.top5Announce, "full")}
           </span>
           <span className={`top10-phase-pill ${showPresentations ? "top10-phase-pill--done" : "top10-phase-pill--upcoming"}`}>
-            {showPresentations ? "✓" : "⏳"} Presentations - {fmt(DATES.presentations, "full")}
+            {showPresentations ? "✓" : "⏳"} Top 3 - {fmt(DATES.winnersAnnounce, "full")}
           </span>
         </div>
 
@@ -135,7 +135,7 @@ export default function Top10Teams() {
         ) : displayTeams.length === 0 ? (
           <p className="top10-empty">
             {showPresentations
-              ? "Presentation-eligible teams will be listed here."
+              ? "Top 3 teams will be listed here."
               : showTop5
               ? "Top 5 teams will be listed here after the announcement."
               : "Selected teams will be listed here after the announcement."}

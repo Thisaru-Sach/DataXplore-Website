@@ -1,201 +1,313 @@
 -- ═══════════════════════════════════════════════════════════
---  DataXplore 2.0 — Supabase Database Schema (Updated)
---  Run this entire file in: Supabase Dashboard → SQL Editor
+--  DataXplore 2.0 — FINAL Complete Database Schema
+--  Statistics Society, University of Sri Jayewardenepura
 --
---  If the teams table already exists, use the ALTER statements
---  at the bottom of this file instead of re-running CREATE.
+--  HOW TO USE:
+--  ─────────────────────────────────────────────────────────
+--  FRESH INSTALL (new Supabase project):
+--    Run this entire file in SQL Editor — top to bottom.
+--
+--  EXISTING PROJECT (table already created):
+--    Skip Section 1 (CREATE TABLE).
+--    Run Sections 2 onwards.
+--    Then run the ALTER TABLE block at the very bottom
+--    to add any missing columns.
 -- ═══════════════════════════════════════════════════════════
 
--- ── 1. Teams table ────────────────────────────────────────
---    All fields from the Tally registration form.
---    Populated MANUALLY by admins — not by the registration form.
+
+-- ─────────────────────────────────────────────────────────
+--  SECTION 1 — TABLES
+-- ─────────────────────────────────────────────────────────
+
+-- ── 1a. Teams ─────────────────────────────────────────────
+--  Populated manually by admin from Tally registration export.
+--  Authentication uses nic_number + email via Edge Function.
+
 CREATE TABLE IF NOT EXISTS teams (
 
-  -- ── Internal IDs ──────────────────────────────────────
-  id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  submission_id       text,                        -- Tally submission ID
-  respondent_id       text,                        -- Tally respondent ID
-  submitted_at_tally  timestamptz,                 -- when they submitted the Tally form
+  -- Internal ID (auto-generated, never exposed to teams)
+  id                    uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
 
-  -- ── Lead registrant details ───────────────────────────
-  full_name           text NOT NULL,               -- full legal name
-  preferred_name      text,                        -- name they go by
-  university          text NOT NULL,               -- university name
-  faculty             text,                        -- faculty name
-  nic_number          text,                        -- NIC number
-  student_id_url      text,                        -- link to student ID pic in Tally storage
-  email               text UNIQUE NOT NULL,        -- used to authenticate
-  contact_number      text,                        -- phone
-  academic_year       text,                        -- e.g. "2nd Year", "3rd Year"
+  -- Tally registration metadata
+  submission_id         text,                         -- Tally submission ID
+  respondent_id         text,                         -- Tally respondent ID
+  submitted_at_tally    timestamptz,                  -- Tally form submission timestamp
 
-  -- ── Team info ─────────────────────────────────────────
-  team_name           text NOT NULL,
-  member_count        int  CHECK (member_count BETWEEN 3 AND 4),
+  -- Lead registrant personal details
+  full_name             text        NOT NULL,          -- full legal name
+  preferred_name        text,                          -- nickname / preferred name
+  university            text        NOT NULL,          -- institution name
+  faculty               text,                          -- faculty / department
+  nic_number            text,                          -- NIC (used for login)
+  student_id_url        text,                          -- Tally storage link to student ID photo
+  email                 text        UNIQUE NOT NULL,   -- email (used for login)
+  contact_number        text,                          -- phone number
+  academic_year         text,                          -- e.g. "2nd Year"
 
-  -- ── Member 1 (lead registrant repeated for clarity) ──
-  member1       text,
+  -- Team details
+  team_name             text        NOT NULL,
+  member_count          int         CHECK (member_count BETWEEN 3 AND 4),
 
-  -- ── Member 2 ──────────────────────────────────────────
-  member2       text,
+  -- Team members (format: "Full Name — +94 7X XXX XXXX")
+  member1               text,                          -- member 1 name + contact
+  member2               text,                          -- member 2 name + contact
+  member3               text,                          -- member 3 name + contact
+  member4               text,                          -- member 4 (null for 3-member teams)
 
-  -- ── Member 3 ──────────────────────────────────────────
-  member3        text,
+  -- ── Competition progression flags ─────────────────────
+  -- These are toggled by admin as the competition advances.
+  -- Each one unlocks a new feature on the public website.
 
-  -- ── Member 4 (optional — only if team has 4 members) ─
-  member4        text,
+  stage1_eligible       boolean     DEFAULT true,      -- can submit Stage 1
+  stage3_eligible       boolean     DEFAULT false,      -- Top 10 — can submit Stage 3
+                                                        -- revealed on top10Announce date
+  top5_eligible         boolean     DEFAULT false,      -- Top 5 Finalist
+                                                        -- revealed on top5Announce date
+  presentation_eligible boolean     DEFAULT false,      -- Final presenter
+                                                        -- revealed on presentations date
 
-  -- ── Competition progress ───────────────────────────────
-  stage1_eligible     boolean DEFAULT true,
-  stage3_eligible     boolean DEFAULT false,
-
-  -- ── Record metadata ───────────────────────────────────
-  created_at          timestamptz DEFAULT now()    -- when admin inserted this row
+  -- Record metadata
+  created_at            timestamptz DEFAULT now()       -- when admin inserted this row
 );
 
 
--- ── 2. Submissions table ───────────────────────────────────
---    One row per uploaded zip file. Unchanged.
+-- ── 1b. Submissions ───────────────────────────────────────
+--  One row per uploaded zip file.
+--  Files stored in Supabase Storage bucket "submissions".
+--  Path format: stage{n}/{team_name}/{filename}.zip
+--
+--  One submission per team per stage is enforced by
+--  api/upload.js — old record + file deleted before insert.
+
 CREATE TABLE IF NOT EXISTS submissions (
-  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  team_id         uuid NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
-  stage           int  NOT NULL CHECK (stage IN (1, 3)),
-  file_name       text NOT NULL,
-  file_path       text NOT NULL,
-  file_size_bytes bigint,
-  file_type       text,
-  notes           text,
+  id              uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+  team_id         uuid        NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+  stage           int         NOT NULL CHECK (stage IN (1, 3)),
+  file_name       text        NOT NULL,                 -- zip filename
+  file_path       text        NOT NULL,                 -- path in Supabase Storage
+  file_size_bytes bigint,                               -- zip file size in bytes
+  file_type       text,                                 -- always "zip"
+  notes           text,                                 -- optional notes from team
   submitted_at    timestamptz DEFAULT now()
 );
 
 
--- ── 3. Row Level Security ─────────────────────────────────
+-- ─────────────────────────────────────────────────────────
+--  SECTION 2 — ROW LEVEL SECURITY
+-- ─────────────────────────────────────────────────────────
+--  The service role key (used in /api/* serverless functions)
+--  bypasses ALL RLS automatically — no policy needed for admin.
+--
+--  The anon/publishable key (used in browser) is restricted
+--  by the policies below.
+
 ALTER TABLE teams       ENABLE ROW LEVEL SECURITY;
 ALTER TABLE submissions ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "teams_own_row" ON teams;
-
-CREATE POLICY "teams_own_row" ON teams
-  FOR ALL
-  USING (id::text = current_setting('request.jwt.claims', true)::json->>'team_id');
-
-  DROP POLICY IF EXISTS "submissions_own_rows" ON submissions;
-
-CREATE POLICY "submissions_own_rows" ON submissions
-  FOR ALL
-  USING (team_id::text = current_setting('request.jwt.claims', true)::json->>'team_id');
+-- Drop all existing policies before recreating cleanly
+DROP POLICY IF EXISTS "teams_own_row"                  ON teams;
+DROP POLICY IF EXISTS "public_read_stage3_teams"       ON teams;
+DROP POLICY IF EXISTS "public_read_eligible_teams"     ON teams;
+DROP POLICY IF EXISTS "submissions_own_rows"           ON submissions;
+DROP POLICY IF EXISTS "Allow anon inserts to submissions"  ON submissions;
+DROP POLICY IF EXISTS "Allow anon selects on submissions"  ON submissions;
 
 
--- ── 4. Indexes ────────────────────────────────────────────
-CREATE INDEX IF NOT EXISTS submissions_team_id_idx ON submissions(team_id);
-CREATE INDEX IF NOT EXISTS submissions_stage_idx   ON submissions(stage);
-CREATE INDEX IF NOT EXISTS teams_email_idx         ON teams(email);
-CREATE INDEX IF NOT EXISTS teams_nic_idx           ON teams(nic_number);
+-- ── Teams policies ────────────────────────────────────────
+
+-- Public can read teams that have any eligibility flag set.
+-- Used by Top10Teams.jsx to display selected teams on homepage.
+-- Only exposes: id, team_name, university, stage3_eligible,
+--               top5_eligible, presentation_eligible
+-- (sensitive fields like nic_number, email are never selected
+--  in the public query — SELECT in Top10Teams.jsx is limited)
+CREATE POLICY "public_read_eligible_teams"
+ON teams FOR SELECT TO public
+USING (
+  stage3_eligible       = true OR
+  top5_eligible         = true OR
+  presentation_eligible = true
+);
+
+-- No anon INSERT / UPDATE / DELETE on teams.
+-- All team writes go through /api/admin (service role, server-side).
 
 
--- ── 5. Admin overview view ────────────────────────────────
-CREATE OR REPLACE VIEW admin_submission_overview AS
-  SELECT
-    t.id,
-    t.submission_id,
-    t.respondent_id,
-    t.submitted_at_tally,
-    t.full_name,
-    t.preferred_name,
-    t.team_name,
-    t.university,
-    t.faculty,
-    t.email,
-    t.contact_number,
-    t.academic_year,
-    t.nic_number,
-    t.student_id_url,
-    t.member_count,
-    t.member1,
-    t.member2,
-    t.member3,
-    t.member4,
-    t.stage1_eligible,
-    t.stage3_eligible,
-    COUNT(s.id) FILTER (WHERE s.stage = 1) AS stage1_files,
-    COUNT(s.id) FILTER (WHERE s.stage = 3) AS stage3_files,
-    MAX(s.submitted_at)                     AS last_submission,
-    t.created_at                            AS registered_at
-  FROM teams t
-  LEFT JOIN submissions s ON s.team_id = t.id
-  GROUP BY t.id
-  ORDER BY t.created_at DESC;
+-- ── Submissions policies ──────────────────────────────────
+
+-- Anon can SELECT submissions.
+-- Used by getExistingSubmission() in supabase.js to check
+-- if a team already has a submission before uploading.
+CREATE POLICY "anon_select_submissions"
+ON submissions FOR SELECT TO public
+USING (true);
+
+-- Anon can DELETE their own submission row.
+-- Used by deleteSubmissionRow() in supabase.js when a team
+-- resubmits — deletes the old DB row before uploading the new zip.
+-- (The storage file deletion uses service role via /api/upload)
+CREATE POLICY "anon_delete_submissions"
+ON submissions FOR DELETE TO public
+USING (true);
+
+-- Note: INSERT on submissions is done server-side via /api/upload.js
+-- using the service role key. No anon INSERT policy needed.
 
 
--- ═══════════════════════════════════════════════════════════
---  IF THE TEAMS TABLE ALREADY EXISTS — run these ALTER
---  statements instead of the CREATE TABLE above.
---  Comment out the CREATE TABLE block and uncomment these.
--- ═══════════════════════════════════════════════════════════
+-- ─────────────────────────────────────────────────────────
+--  SECTION 3 — STORAGE POLICIES
+-- ─────────────────────────────────────────────────────────
+--  Storage bucket name: "submissions"
+--  Create it manually: Supabase → Storage → New Bucket
+--  Name: submissions | Public: OFF
+--
+--  All storage writes (upload, delete) go through
+--  /api/upload.js and /api/admin.js using service role.
+--  The policies below are kept minimal.
 
--- ALTER TABLE teams ADD COLUMN IF NOT EXISTS submission_id      text;
--- ALTER TABLE teams ADD COLUMN IF NOT EXISTS respondent_id      text;
--- ALTER TABLE teams ADD COLUMN IF NOT EXISTS submitted_at_tally timestamptz;
--- ALTER TABLE teams ADD COLUMN IF NOT EXISTS full_name          text;
--- ALTER TABLE teams ADD COLUMN IF NOT EXISTS preferred_name     text;
--- ALTER TABLE teams ADD COLUMN IF NOT EXISTS faculty            text;
--- ALTER TABLE teams ADD COLUMN IF NOT EXISTS nic_number         text;
--- ALTER TABLE teams ADD COLUMN IF NOT EXISTS student_id_url     text;
--- ALTER TABLE teams ADD COLUMN IF NOT EXISTS academic_year      text;
--- ALTER TABLE teams ADD COLUMN IF NOT EXISTS member1      text;
--- ALTER TABLE teams ADD COLUMN IF NOT EXISTS member2       text;
--- ALTER TABLE teams ADD COLUMN IF NOT EXISTS member3       text;
--- ALTER TABLE teams ADD COLUMN IF NOT EXISTS member4       text;
--- Then refresh the view:
--- CREATE OR REPLACE VIEW admin_submission_overview AS ...
-
+-- Allow anon to upload (belt-and-suspenders fallback,
+-- primary upload path is via service role in api/upload.js)
 DROP POLICY IF EXISTS "Allow anon uploads to submissions" ON storage.objects;
 
 CREATE POLICY "Allow anon uploads to submissions"
-ON storage.objects FOR INSERT
-TO public
+ON storage.objects FOR INSERT TO public
 WITH CHECK (bucket_id = 'submissions');
 
--- Remove the JWT-dependent policy
-DROP POLICY IF EXISTS "Allow anon inserts to submissions" ON submissions;
 
--- Allow anonymous inserts into the submissions table
-CREATE POLICY "Allow anon inserts to submissions"
-ON submissions FOR INSERT
-TO public
-WITH CHECK (true);
+-- ─────────────────────────────────────────────────────────
+--  SECTION 4 — INDEXES
+-- ─────────────────────────────────────────────────────────
 
--- Allow teams to view their own submissions (if you use getTeamSubmissions on the frontend)
--- Note: Since the user is anon, they could technically query any team's submissions if they knew the team_id. 
+CREATE INDEX IF NOT EXISTS teams_email_idx              ON teams(email);
+CREATE INDEX IF NOT EXISTS teams_nic_idx                ON teams(nic_number);
+CREATE INDEX IF NOT EXISTS teams_stage3_idx             ON teams(stage3_eligible);
+CREATE INDEX IF NOT EXISTS teams_top5_idx               ON teams(top5_eligible);
+CREATE INDEX IF NOT EXISTS teams_presentation_idx       ON teams(presentation_eligible);
+CREATE INDEX IF NOT EXISTS submissions_team_id_idx      ON submissions(team_id);
+CREATE INDEX IF NOT EXISTS submissions_stage_idx        ON submissions(stage);
+CREATE INDEX IF NOT EXISTS submissions_team_stage_idx   ON submissions(team_id, stage);
 
-DROP POLICY IF EXISTS "Allow anon selects on submissions" ON submissions;
 
-CREATE POLICY "Allow anon selects on submissions"
-ON submissions FOR SELECT
-TO public
-USING (true);
+-- ─────────────────────────────────────────────────────────
+--  SECTION 5 — ADMIN OVERVIEW VIEW
+-- ─────────────────────────────────────────────────────────
+--  Used exclusively by /api/admin.js (service role).
+--  Denormalised view joining teams + submission counts.
+--
+--  IMPORTANT: No ORDER BY inside the view.
+--  PostgREST does not support ORDER BY in views and
+--  it causes PGRST002 schema cache errors.
+
+DROP VIEW IF EXISTS admin_submission_overview;
+
+CREATE OR REPLACE VIEW admin_submission_overview AS
+SELECT
+  -- Team identity
+  t.id,
+  t.submission_id,
+  t.respondent_id,
+  t.submitted_at_tally,
+
+  -- Lead registrant
+  t.full_name,
+  t.preferred_name,
+  t.university,
+  t.faculty,
+  t.nic_number,
+  t.student_id_url,
+  t.email,
+  t.contact_number,
+  t.academic_year,
+
+  -- Team
+  t.team_name,
+  t.member_count,
+  t.member1,
+  t.member2,
+  t.member3,
+  t.member4,
+
+  -- Competition progression flags
+  t.stage1_eligible,
+  t.stage3_eligible,
+  t.top5_eligible,
+  t.presentation_eligible,
+
+  -- Record metadata
+  t.created_at,
+
+  -- Submission counts (aggregated)
+  COUNT(s.id) FILTER (WHERE s.stage = 1) AS stage1_files,
+  COUNT(s.id) FILTER (WHERE s.stage = 3) AS stage3_files,
+  MAX(s.submitted_at)                     AS last_submission
+
+FROM teams t
+LEFT JOIN submissions s ON s.team_id = t.id
+GROUP BY t.id;
+
+-- Grant view access to all roles
+-- (service role reads it in /api/admin.js)
+GRANT SELECT ON admin_submission_overview TO anon;
+GRANT SELECT ON admin_submission_overview TO authenticated;
+GRANT SELECT ON admin_submission_overview TO service_role;
+
+
+-- ─────────────────────────────────────────────────────────
+--  SECTION 6 — RELOAD POSTGREST SCHEMA CACHE
+-- ─────────────────────────────────────────────────────────
+--  Required after any structural changes (new columns, new
+--  views) to avoid PGRST002 errors.
+--  Run this every time you make schema changes.
+
+NOTIFY pgrst, 'reload schema';
+
+
+-- ─────────────────────────────────────────────────────────
+--  SECTION 7 — VERIFICATION QUERIES
+-- ─────────────────────────────────────────────────────────
+--  Run these after the schema to confirm everything works.
+
+-- Check tables exist with correct columns
+SELECT column_name, data_type, column_default
+FROM information_schema.columns
+WHERE table_name = 'teams'
+ORDER BY ordinal_position;
+
+-- Check view works (no PGRST002 error)
+SELECT id, team_name, stage3_eligible, top5_eligible,
+       presentation_eligible, stage1_files, stage3_files
+FROM admin_submission_overview
+LIMIT 5;
+
+-- Check RLS policies
+SELECT tablename, policyname, cmd, qual
+FROM pg_policies
+WHERE tablename IN ('teams', 'submissions')
+ORDER BY tablename, policyname;
+
 
 -- ═══════════════════════════════════════════════════════════
---  Run this in Supabase SQL Editor
---  Allows the public site to read team names for Top 10 display.
---  Only reads stage3_eligible=true teams — no sensitive data.
+--  ALTER TABLE BLOCK
+--  ─────────────────────────────────────────────────────────
+--  If your teams table ALREADY EXISTS and you are adding
+--  columns that may be missing, uncomment and run these.
+--  Safe to run multiple times (IF NOT EXISTS prevents errors).
 -- ═══════════════════════════════════════════════════════════
- 
--- Allow anyone (anon) to read team names + university for Top 10 display
--- Only exposes: id, team_name, university for stage3_eligible teams
--- Sensitive fields (NIC, email, student_id_url) are NOT in the SELECT
--- in Top10Teams.jsx so they are never sent to the browser.
 
-DROP POLICY IF EXISTS "public_read_stage3_teams" ON teams;
-
-CREATE POLICY "public_read_stage3_teams"
-ON teams
-FOR SELECT
-TO public              -- anon key can read
-USING (stage3_eligible = true);  -- only eligible teams are visible
- 
--- ── If you already have a "teams_own_row" policy that blocks everything ──
--- The service role (admin) bypasses all RLS, so admin still sees all teams.
--- The anon client only sees stage3_eligible=true rows via the policy above.
- 
--- Verify:
--- SELECT team_name, university FROM teams WHERE stage3_eligible = true;
+-- ALTER TABLE teams ADD COLUMN IF NOT EXISTS submission_id         text;
+-- ALTER TABLE teams ADD COLUMN IF NOT EXISTS respondent_id         text;
+-- ALTER TABLE teams ADD COLUMN IF NOT EXISTS submitted_at_tally    timestamptz;
+-- ALTER TABLE teams ADD COLUMN IF NOT EXISTS full_name             text;
+-- ALTER TABLE teams ADD COLUMN IF NOT EXISTS preferred_name        text;
+-- ALTER TABLE teams ADD COLUMN IF NOT EXISTS faculty               text;
+-- ALTER TABLE teams ADD COLUMN IF NOT EXISTS nic_number            text;
+-- ALTER TABLE teams ADD COLUMN IF NOT EXISTS student_id_url        text;
+-- ALTER TABLE teams ADD COLUMN IF NOT EXISTS academic_year         text;
+-- ALTER TABLE teams ADD COLUMN IF NOT EXISTS member1               text;
+-- ALTER TABLE teams ADD COLUMN IF NOT EXISTS member2               text;
+-- ALTER TABLE teams ADD COLUMN IF NOT EXISTS member3               text;
+-- ALTER TABLE teams ADD COLUMN IF NOT EXISTS member4               text;
+-- ALTER TABLE teams ADD COLUMN IF NOT EXISTS stage1_eligible       boolean DEFAULT true;
+-- ALTER TABLE teams ADD COLUMN IF NOT EXISTS stage3_eligible       boolean DEFAULT false;
+-- ALTER TABLE teams ADD COLUMN IF NOT EXISTS top5_eligible         boolean DEFAULT false;
+-- ALTER TABLE teams ADD COLUMN IF NOT EXISTS presentation_eligible boolean DEFAULT false;
