@@ -144,7 +144,7 @@ export default function Dashboard() {
         </div>
         <div className="adm-stat">
           <span className="adm-stat-val">{teams.filter(t => t.presentation_eligible).length}</span>
-          <span className="adm-stat-lbl">Presenters</span>
+          <span className="adm-stat-lbl">Top 3</span>
         </div>
         <div className="adm-stat">
           <span className="adm-stat-val">{teams.filter(t => t.stage3_files > 0).length}</span>
@@ -169,7 +169,7 @@ export default function Dashboard() {
                 {/* ── Four eligibility columns ── */}
                 <th title="Top 10 — can submit Stage 3">S3 Eligible</th>
                 <th title="Top 5 — revealed on top5Announce date">Top 5</th>
-                <th title="Presenter — revealed on presentations date">Presenter</th>
+                <th title="Top 3 — revealed on top5Announce date">Presenter</th>
                 <th>Last Submit</th>
                 <th>Details</th>
               </tr>
@@ -226,7 +226,7 @@ export default function Dashboard() {
                       title="Toggle Presentation eligibility"
                       disabled={!t.top5_eligible}
                     >
-                      {t.presentation_eligible ? "🎤" : "—"}
+                      {t.presentation_eligible ? "🏆" : "—"}
                     </button>
                   </td>
 
@@ -356,7 +356,7 @@ export default function Dashboard() {
                   </label>
                   <label className="adm-check-label">
                     <input type="checkbox" name="presentation_eligible" checked={form.presentation_eligible} onChange={onChange} />
-                    Presentation Eligible
+                    Top 3 Finalist
                   </label>
                 </div>
               </div>
