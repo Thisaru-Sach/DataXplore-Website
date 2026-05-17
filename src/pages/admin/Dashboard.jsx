@@ -169,7 +169,7 @@ export default function Dashboard() {
                 {/* ── Four eligibility columns ── */}
                 <th title="Top 10 — can submit Stage 3">S3 Eligible</th>
                 <th title="Top 5 — revealed on top5Announce date">Top 5</th>
-                <th title="Top 3 — revealed on top5Announce date">Presenter</th>
+                <th title="Top 3 — revealed on top3Announce date">Top 3</th>
                 <th>Last Submit</th>
                 <th>Details</th>
               </tr>
@@ -223,7 +223,7 @@ export default function Dashboard() {
                     <button
                       className={`adm-toggle ${t.presentation_eligible ? "adm-toggle--cyan" : ""}`}
                       onClick={() => toggle(t.id, "presentation_eligible", t.presentation_eligible)}
-                      title="Toggle Presentation eligibility"
+                      title="Toggle Top 3 eligibility"
                       disabled={!t.top5_eligible}
                     >
                       {t.presentation_eligible ? "🏆" : "—"}
