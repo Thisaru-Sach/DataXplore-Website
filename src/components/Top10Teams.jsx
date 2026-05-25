@@ -70,7 +70,7 @@ export default function Top10Teams() {
   // ── Badge helper ───────────────────────────────────────
   function getBadge(team) {
     if (showPresentations && team.presentation_eligible) {
-      return <span className="top10-badge top10-badge--presenter">🎤 Presenter</span>;
+      return <span className="top10-badge top10-badge--presenter">🏆 Top 3</span>;
     }
     if (showTop5 && team.top5_eligible) {
       return <span className="top10-badge top10-badge--top5">🏆 Top 5 Finalist</span>;
